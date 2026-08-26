@@ -424,8 +424,8 @@
   .install-steps b{color:var(--text)}
   .install-steps p{margin:2px 0}
 
-  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(140%);background:#1F2937;color:#fff;padding:12px 18px;border-radius:14px;font-size:13px;z-index:130;transition:transform .35s ease;max-width:88%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(200%);opacity:0;visibility:hidden;pointer-events:none;background:#1F2937;color:#fff;padding:12px 18px;border-radius:14px;font-size:13px;z-index:130;transition:transform .35s ease, opacity .35s ease, visibility .35s;max-width:88%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible}
 
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:99}
 
