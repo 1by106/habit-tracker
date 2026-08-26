@@ -238,6 +238,27 @@
   .pv-habit .pv-icon{font-size:22px;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;flex:none}
   .pv-habit .pv-name{font-size:14px;font-weight:600;color:var(--muted)}
 
+  /* ---------- 编辑习惯弹窗 ---------- */
+  .edit-modal{max-width:440px;text-align:left}
+  .edit-modal .m-title{font-size:18px;font-weight:800;text-align:center;margin-bottom:14px}
+  .edit-preview{margin-bottom:10px}
+  .edit-row{display:flex;gap:10px;align-items:center;margin-bottom:4px}
+  .edit-row input[type=text]{
+    flex:1;border:1px solid #E5E7EB;border-radius:12px;padding:10px 12px;font-size:15px;
+    outline:none;font-family:inherit;color:var(--text);background:#fff;
+  }
+  .edit-row input[type=text]:focus{border-color:var(--accent)}
+  .edit-row .emoji-btn{
+    flex:none;width:46px;height:46px;border-radius:13px;border:1px solid #E5E7EB;
+    background:#F9FAFB;font-size:22px;cursor:pointer;
+  }
+  #editEmojiGrid{max-height:230px}
+  #editEmojiGrid .eg-grid{grid-template-columns:repeat(6,1fr)}
+  .edit-actions{display:flex;gap:10px;margin-top:14px}
+  .edit-actions .m-btn{flex:1;margin-top:0}
+  .m-btn.ghost{background:#F3F4F6;color:#6B7280}
+  .m-btn.ghost:hover{background:#E5E7EB}
+
   /* 奖杯解锁弹窗 */
   .modal-mask{
     position:fixed;inset:0;background:rgba(17,24,39,.55);z-index:100;
@@ -325,6 +346,22 @@
       <div class="m-title" id="mTitle">解锁成就！</div>
       <div class="m-sub" id="mSub"></div>
       <button class="m-btn" id="mClose">太棒了 🎉</button>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="editModal">
+    <div class="modal edit-modal">
+      <div class="m-title">✏️ 编辑习惯</div>
+      <div class="edit-preview" id="editPreview"></div>
+      <div class="edit-row">
+        <input id="editName" type="text" maxlength="12" autocomplete="off" />
+        <button type="button" class="emoji-btn" id="editEmojiBtn" aria-label="选择表情">😀</button>
+      </div>
+      <div class="emoji-grid open" id="editEmojiGrid"></div>
+      <div class="edit-actions">
+        <button class="m-btn ghost" id="editCancel" type="button">取消</button>
+        <button class="m-btn" id="editSave" type="button">💾 保存</button>
+      </div>
     </div>
   </div>
 
@@ -1152,7 +1189,7 @@
     var id = card.getAttribute('data-id');
     if (e.target.closest('.check')) { toggle(id); return; }
     if (e.target.closest('.del')) { removeHabit(id); return; }
-    if (e.target.closest('.edit')) { renameHabit(id); }
+    if (e.target.closest('.edit')) { openEdit(id); }
   });
 
   function toggle(id) {
@@ -1184,18 +1221,69 @@
     if (currentPage === 'achieve') renderAchievements();
   }
 
-  function renameHabit(id) {
+  /* ---------- 编辑习惯（名称 + 表情） ---------- */
+  var editModalEl = document.getElementById('editModal');
+  var editNameInput = document.getElementById('editName');
+  var editEmojiBtn = document.getElementById('editEmojiBtn');
+  var editEmojiGridEl = document.getElementById('editEmojiGrid');
+  var editPreviewEl = document.getElementById('editPreview');
+  var editTargetId = null;
+  var editEmoji = '';
+
+  function highlightGrid(container, em) {
+    container.querySelectorAll('button').forEach(function (b) {
+      b.classList.toggle('selected', b.dataset.em === em);
+    });
+  }
+
+  function renderEditPreview() {
+    var name = editNameInput.value.trim() || emojiDefaultName(editEmoji) || '新习惯';
+    editPreviewEl.innerHTML = '<div class="pv-label">预览</div>' +
+      '<div class="pv-habit"><span class="pv-icon">' + (editEmoji || '📌') + '</span>' +
+      '<span class="pv-name">' + escapeHtml(name) + '</span></div>';
+  }
+
+  function openEdit(id) {
     var h = habits.find(function (x) { return x.id === id; });
     if (!h) return;
-    var name = window.prompt('输入新的习惯名称：', h.name);
-    if (name === null) return;
-    name = name.trim().slice(0, 12);
-    if (!name) return;
-    h.name = name;
+    editTargetId = id;
+    editEmoji = h.icon || '📌';
+    editNameInput.value = h.name;
+    editEmojiBtn.textContent = editEmoji;
+    editEmojiGridEl.classList.add('open');
+    highlightGrid(editEmojiGridEl, editEmoji);
+    renderEditPreview();
+    editModalEl.classList.add('show');
+  }
+
+  function closeEdit() {
+    editModalEl.classList.remove('show');
+    editTargetId = null;
+  }
+
+  function selectEditEmoji(em) {
+    editEmoji = (editEmoji === em) ? '' : em;
+    editEmojiBtn.textContent = editEmoji || '😀';
+    highlightGrid(editEmojiGridEl, editEmoji);
+    renderEditPreview();
+  }
+
+  function saveEdit() {
+    var h = habits.find(function (x) { return x.id === editTargetId; });
+    if (!h) { closeEdit(); return; }
+    var name = editNameInput.value.trim();
+    if (name) h.name = name.slice(0, 12);
+    if (editEmoji) h.icon = editEmoji;
     save(); render();
     if (currentPage === 'stats') renderStats();
     if (currentPage === 'achieve') renderAchievements();
+    closeEdit();
   }
+
+  editNameInput.addEventListener('input', renderEditPreview);
+  editEmojiBtn.addEventListener('click', function () { editEmojiGridEl.classList.toggle('open'); });
+  document.getElementById('editCancel').addEventListener('click', closeEdit);
+  document.getElementById('editSave').addEventListener('click', saveEdit);
 
   /* ---------- 添加：表情网格 + 自动命名 + 预览 ---------- */
   var formEl = document.getElementById('addForm');
@@ -1209,7 +1297,7 @@
   var seen = {};
   EMOJIS.forEach(function (em) { if (!seen[em]) { seen[em] = 1; uniqueEmojis.push(em); } });
 
-  (function buildEmojiGrid() {
+  function buildEmojiGrid(container, onSelect) {
     var grid = document.createElement('div');
     grid.className = 'eg-grid';
     uniqueEmojis.forEach(function (em) {
@@ -1217,11 +1305,13 @@
       b.type = 'button';
       b.textContent = em;
       b.dataset.em = em;
-      b.addEventListener('click', function () { selectEmoji(em); });
+      b.addEventListener('click', function () { onSelect(em); });
       grid.appendChild(b);
     });
-    emojiGridEl.appendChild(grid);
-  })();
+    container.appendChild(grid);
+  }
+  buildEmojiGrid(emojiGridEl, selectEmoji);
+  buildEmojiGrid(document.getElementById('editEmojiGrid'), selectEditEmoji);
 
   function selectEmoji(em) {
     selectedEmoji = (selectedEmoji === em) ? '' : em;
