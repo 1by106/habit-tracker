@@ -4,6 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>习惯打卡</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#10B981" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="习惯打卡" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" />
 <style>
   :root{
@@ -281,6 +288,37 @@
   }
   .modal .m-btn:hover{background:var(--accent-dark)}
 
+  /* ---------- 每日提醒 + 安装提示 ---------- */
+  .bell{position:relative;flex:none;width:46px;height:46px;border-radius:50%;border:1px solid #E5E7EB;background:#fff;font-size:20px;cursor:pointer;transition:transform .15s ease, background .2s ease}
+  .bell:hover{background:#F3F4F6}
+  .bell:active{transform:scale(.92)}
+  .bell .bell-dot{position:absolute;top:7px;right:8px;width:9px;height:9px;border-radius:50%;background:#D1D5DB;border:2px solid #fff;transition:background .3s ease}
+  .bell .bell-dot.on{background:#EF4444}
+
+  .install-tip{display:flex;align-items:center;gap:10px;background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46;border-radius:14px;padding:10px 12px;margin-bottom:14px;font-size:12px;line-height:1.5}
+  .install-tip .it-text{flex:1}
+  .install-tip button{border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:9px;cursor:pointer;flex:none;font-family:inherit}
+  .install-tip .it-close{background:transparent;color:#6B7280;padding:4px 6px;font-size:13px}
+  .install-tip .it-close:hover{color:#111827}
+
+  .remind-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F0F1F3;font-size:14px}
+  .remind-row:last-of-type{border-bottom:none}
+  .remind-row input[type=time]{border:1px solid #E5E7EB;border-radius:10px;padding:8px 10px;font-size:14px;font-family:inherit;color:var(--text);outline:none}
+  .remind-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .switch{position:relative;display:inline-block;width:48px;height:28px;flex:none}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;cursor:pointer;inset:0;background:#D1D5DB;border-radius:28px;transition:background .3s ease}
+  .slider:before{content:"";position:absolute;height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform .3s ease}
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider:before{transform:translateX(20px)}
+
+  .install-steps{font-size:13px;color:#374151;line-height:1.9;text-align:left;margin-top:6px}
+  .install-steps b{color:var(--text)}
+  .install-steps p{margin:2px 0}
+
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(140%);background:#1F2937;color:#fff;padding:12px 18px;border-radius:14px;font-size:13px;z-index:130;transition:transform .35s ease;max-width:88%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:99}
 
   @media (max-width:400px){
@@ -297,6 +335,7 @@
         <div class="date" id="dateLabel"></div>
       </div>
       <div class="progress-wrap">
+        <button class="bell" id="bellBtn" aria-label="每日提醒">🔔<span class="bell-dot" id="bellDot"></span></button>
         <div class="progress-num" id="progressNum">0/0</div>
         <svg class="ring" viewBox="0 0 60 60">
           <circle class="ring-bg" cx="30" cy="30" r="26"></circle>
@@ -306,6 +345,12 @@
     </header>
 
     <div class="quote" id="quoteBanner"></div>
+
+    <div class="install-tip" id="installTip">
+      <span class="it-text">📱 添加到手机主屏幕，像 App 一样每天打卡</span>
+      <button id="installBtn" type="button">查看方法</button>
+      <button class="it-close" id="installClose" type="button" aria-label="关闭">✕</button>
+    </div>
 
     <nav class="tabs">
       <button class="tab active" data-page="home">🏠 主页</button>
@@ -364,6 +409,37 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-mask" id="installModal">
+    <div class="modal edit-modal">
+      <div class="m-title">📱 添加到主屏幕</div>
+      <div class="install-steps">
+        <p><b>iPhone / iPad（Safari）：</b></p>
+        <p>1. 点底部「分享」按钮（方框箭头）</p>
+        <p>2. 选「添加到主屏幕」</p>
+        <p>3. 点右上角「添加」</p>
+        <p><b>Android（Chrome）：</b></p>
+        <p>1. 点右上角「⋮」菜单</p>
+        <p>2. 选「添加到主屏幕」或「安装应用」</p>
+      </div>
+      <button class="m-btn" id="installClose2" type="button" style="width:100%">知道了</button>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="remindModal">
+    <div class="modal edit-modal">
+      <div class="m-title">🔔 每日提醒</div>
+      <div class="remind-row"><span>开启提醒</span><label class="switch"><input type="checkbox" id="remindOn" /><span class="slider"></span></label></div>
+      <div class="remind-row"><span>提醒时间</span><input type="time" id="remindTime" value="20:00" /></div>
+      <p class="remind-note">提醒在页面打开时生效；建议把网站「添加到主屏幕」后使用（手机浏览器最小化时通知可能延迟）。</p>
+      <div class="edit-actions">
+        <button class="m-btn ghost" id="remindCancel" type="button">关闭</button>
+        <button class="m-btn" id="remindSave" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 
   <canvas id="confetti"></canvas>
 
@@ -812,16 +888,18 @@
         if (data && Array.isArray(data.habits)) {
           var h = data.habits.map(function (x) { x.history = x.history || {}; return x; });
           h.unlocks = data.unlocks || {};
+          h.reminder = data.reminder || { enabled: false, time: '20:00' };
           return h;
         }
       }
     } catch (e) { /* ignore */ }
     var d = defaults();
     d.unlocks = {};
+    d.reminder = { enabled: false, time: '20:00' };
     return d;
   }
   function save() {
-    var data = { version: 1, habits: habits, unlocks: habits.unlocks };
+    var data = { version: 1, habits: habits, unlocks: habits.unlocks, reminder: habits.reminder };
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
   }
 
@@ -1411,6 +1489,111 @@
       else { ctx.clearRect(0, 0, canvas.width, canvas.height); rafId = null; }
     })();
   }
+
+  /* ---------- 每日提醒 + 安装提示 + Service Worker ---------- */
+  var reminder = habits.reminder || { enabled: false, time: '20:00' };
+  habits.reminder = reminder;
+  var reminderTimer = null;
+  var deferredPrompt = null;
+
+  var bellBtn = document.getElementById('bellBtn');
+  var bellDot = document.getElementById('bellDot');
+  var remindModalEl = document.getElementById('remindModal');
+  var remindOnEl = document.getElementById('remindOn');
+  var remindTimeEl = document.getElementById('remindTime');
+
+  function updateBell() {
+    bellDot.classList.toggle('on', !!reminder.enabled);
+  }
+
+  bellBtn.addEventListener('click', function () {
+    remindOnEl.checked = !!reminder.enabled;
+    remindTimeEl.value = reminder.time || '20:00';
+    remindModalEl.classList.add('show');
+  });
+  document.getElementById('remindCancel').addEventListener('click', function () { remindModalEl.classList.remove('show'); });
+  document.getElementById('remindSave').addEventListener('click', function () {
+    var wasEnabled = reminder.enabled;
+    reminder.enabled = remindOnEl.checked;
+    reminder.time = remindTimeEl.value || '20:00';
+    save();
+    updateBell();
+    remindModalEl.classList.remove('show');
+    if (reminder.enabled && !wasEnabled && 'Notification' in window && Notification.permission === 'default') {
+      try { Notification.requestPermission(); } catch (e) { /* ignore */ }
+    }
+    scheduleReminder();
+    showToast(reminder.enabled ? '🔔 每日提醒已开启（' + reminder.time + '）' : '🔕 提醒已关闭');
+  });
+
+  function scheduleReminder() {
+    if (reminderTimer) clearTimeout(reminderTimer);
+    if (!reminder.enabled) return;
+    var now = new Date();
+    var p = reminder.time.split(':');
+    var target = new Date(now);
+    target.setHours(+p[0], +p[1], 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    reminderTimer = setTimeout(fireReminder, target - now);
+  }
+
+  function fireReminder() {
+    var done = doneCount(), total = habits.length;
+    var body = total === 0 ? '先添加一个习惯，开始你的坚持之旅吧 🌱'
+      : done < total ? '今天已完成 ' + done + '/' + total + '，还有 ' + (total - done) + ' 个没打卡，加油！'
+      : '今天的习惯全部完成，太棒了！🎉';
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification('⏰ 习惯打卡', { body: body, icon: 'apple-touch-icon.png', badge: 'icon-192.png' });
+      } catch (e) { /* ignore */ }
+    }
+    if (navigator.vibrate) { try { navigator.vibrate(200); } catch (e) { /* ignore */ } }
+    showToast('⏰ ' + body);
+    scheduleReminder();
+  }
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 5000);
+  }
+
+  /* 安装提示 */
+  var installTipEl = document.getElementById('installTip');
+  var installModalEl = document.getElementById('installModal');
+  var installBtnEl = document.getElementById('installBtn');
+  try { if (localStorage.getItem('habit-install-tip-dismissed')) installTipEl.style.display = 'none'; } catch (e) { /* ignore */ }
+  document.getElementById('installClose').addEventListener('click', function () {
+    installTipEl.style.display = 'none';
+    try { localStorage.setItem('habit-install-tip-dismissed', '1'); } catch (e) { /* ignore */ }
+  });
+  installBtnEl.addEventListener('click', function () {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+    } else {
+      installModalEl.classList.add('show');
+    }
+  });
+  document.getElementById('installClose2').addEventListener('click', function () { installModalEl.classList.remove('show'); });
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtnEl.textContent = '安装 App';
+  });
+
+  /* Service Worker 注册 */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { /* ignore */ });
+    });
+  }
+
+  scheduleReminder();
+  updateBell();
 
   /* ---------- 启动 ---------- */
   var now = new Date();
