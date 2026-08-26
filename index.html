@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>习惯打卡</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" />
 <style>
   :root{
     --bg:#F4F6F8;
@@ -26,10 +26,10 @@
     background:var(--bg);color:var(--text);line-height:1.5;
     -webkit-font-smoothing:antialiased;
   }
-  .app{max-width:560px;margin:0 auto;padding:22px 16px 130px}
+  .app{max-width:560px;margin:0 auto;padding:22px 16px 150px}
 
   /* ---------- 顶部 ---------- */
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:4px 2px}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:4px 2px}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:.5px}
   .brand .date{color:var(--muted);font-size:13px;margin-top:3px}
   .progress-wrap{display:flex;align-items:center;gap:10px}
@@ -39,12 +39,22 @@
   .ring-fg{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;
     stroke-dasharray:163.36;stroke-dashoffset:163.36;transition:stroke-dashoffset .6s cubic-bezier(.22,1,.36,1)}
 
+  /* ---------- 语录横幅 ---------- */
+  .quote{
+    background:linear-gradient(135deg,#0F766E,#10B981);
+    color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .quote .q-text{font-size:14px;font-weight:600;line-height:1.7}
+  .quote .q-meta{font-size:11px;opacity:.85;margin-top:6px;display:flex;justify-content:space-between}
+  .quote::after{content:"“";position:absolute;right:10px;top:-22px;font-size:90px;opacity:.15;font-family:Georgia,serif}
+
   /* ---------- 页面切换 ---------- */
   .tabs{display:flex;background:#E8EAED;border-radius:13px;padding:4px;margin-bottom:16px;gap:4px}
   .tab{
     flex:1;border:none;background:transparent;padding:10px 0;border-radius:10px;
     font-size:15px;font-weight:600;color:#6B7280;cursor:pointer;transition:all .25s ease;
-    font-family:inherit;
+    font-family:inherit;white-space:nowrap;
   }
   .tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .page{display:none}
@@ -148,36 +158,113 @@
   .mbar .m-fill{height:100%;background:var(--accent);border-radius:6px;transition:width .5s ease}
   .mbar .m-count{width:30px;color:var(--text);font-weight:600;flex:none;text-align:right}
 
+  /* ---------- 成就页 ---------- */
+  .trophy-shelf{display:flex;flex-direction:column;gap:12px}
+  .trophy{
+    display:flex;align-items:center;gap:14px;border-radius:14px;padding:14px;
+    border:1px solid #EDEFF2;background:#fff;transition:all .3s ease;
+  }
+  .trophy.locked{background:#F7F8FA;opacity:.75}
+  .trophy .t-icon{font-size:40px;flex:none;filter:grayscale(1);opacity:.4;transition:all .4s ease}
+  .trophy.unlocked .t-icon{filter:none;opacity:1;animation:trophyPop .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes trophyPop{0%{transform:scale(.3) rotate(-15deg)}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1)}}
+  .trophy .t-info{flex:1;min-width:0}
+  .trophy .t-days{font-size:16px;font-weight:800}
+  .trophy .t-desc{font-size:11px;color:var(--muted);margin-top:2px}
+  .trophy .t-status{font-size:11px;font-weight:700;margin-top:6px}
+  .trophy.unlocked .t-status{color:var(--accent)}
+  .trophy.locked .t-status{color:#C0C6CD}
+  .trophy .t-progress{height:6px;background:#F3F4F6;border-radius:4px;margin-top:6px;overflow:hidden}
+  .trophy .t-progress .fill{height:100%;background:var(--accent);border-radius:4px;transition:width .6s ease}
+  .trophy .t-badge{flex:none;font-size:22px}
+
+  .best-list{display:flex;flex-direction:column;gap:10px}
+  .best-item{display:flex;align-items:center;gap:12px;font-size:13px}
+  .best-item .b-icon{font-size:20px}
+  .best-item .b-name{flex:1;font-weight:600}
+  .best-item .b-streak{color:#F59E0B;font-weight:800}
+
   /* ---------- 添加栏 ---------- */
   .add{
     position:fixed;left:0;right:0;bottom:0;z-index:10;
     background:linear-gradient(to top, #F4F6F8 72%, rgba(244,246,248,0));
-    padding:12px 16px 26px;transition:transform .3s ease;
+    padding:12px 16px 24px;transition:transform .3s ease;
   }
-  .add.hidden{transform:translateY(120%)}
+  .add.hidden{transform:translateY(130%)}
   .add-inner{max-width:528px;margin:0 auto}
-  .add-row{display:flex;gap:10px;background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:6px;box-shadow:var(--shadow)}
-  .add-row input{
-    flex:1;border:none;outline:none;background:transparent;font-size:15px;padding:8px 10px;color:var(--text);
+  .add-card{background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+  .add-row{display:flex;gap:10px;align-items:center}
+  .add-row .emoji-btn{
+    flex:none;width:44px;height:44px;border-radius:13px;border:1px solid #E5E7EB;background:#F9FAFB;
+    font-size:20px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center;
   }
-  .add-row button{
-    border:none;background:var(--accent);color:#fff;font-size:20px;font-weight:700;
-    width:46px;border-radius:12px;cursor:pointer;transition:background .2s ease, transform .15s ease;
+  .add-row .emoji-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .add-row input[type=text]{
+    flex:1;border:none;outline:none;background:transparent;font-size:15px;padding:4px 2px;color:var(--text);min-width:0;
   }
-  .add-row button:active{transform:scale(.92)}
-  .add-row button:hover{background:var(--accent-dark)}
-  .emoji-picker{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding:2px}
-  .emoji-picker::-webkit-scrollbar{display:none}
-  .emoji-picker button{
-    flex:none;font-size:19px;width:38px;height:38px;border-radius:12px;border:1px solid #E5E7EB;
-    background:#fff;cursor:pointer;transition:background .15s ease, transform .15s ease, border-color .15s ease;
+  .add-row .add-btn{
+    flex:none;border:none;cursor:pointer;font-family:inherit;
+    background:linear-gradient(135deg,#10B981,#059669);color:#fff;
+    font-size:14px;font-weight:700;padding:0 18px;height:44px;border-radius:13px;
+    display:flex;align-items:center;gap:6px;
+    box-shadow:0 4px 12px rgba(16,185,129,.35);
+    transition:transform .15s ease, box-shadow .2s ease;
   }
-  .emoji-picker button.selected{background:var(--accent-soft);border-color:var(--accent);transform:scale(1.08)}
+  .add-row .add-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,185,129,.45)}
+  .add-row .add-btn:active{transform:scale(.96)}
+  .add-row .add-btn .plus{font-size:17px;font-weight:800;line-height:1}
+
+  /* 表情网格 */
+  .emoji-grid{
+    display:none;max-height:168px;overflow-y:auto;margin-top:10px;padding-top:10px;
+    border-top:1px solid #F0F1F3;
+  }
+  .emoji-grid.open{display:block}
+  .emoji-grid .eg-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+  .emoji-grid .eg-grid button{
+    aspect-ratio:1;border:none;background:transparent;border-radius:9px;font-size:20px;cursor:pointer;
+    transition:background .15s ease, transform .15s ease;display:flex;align-items:center;justify-content:center;
+  }
+  .emoji-grid .eg-grid button:hover{background:#F3F4F6;transform:scale(1.15)}
+  .emoji-grid .eg-grid button.selected{background:var(--accent-soft)}
+
+  /* 添加预览 */
+  .add-preview{margin-top:10px;border-top:1px dashed #E5E7EB;padding-top:10px}
+  .add-preview .pv-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+  .pv-habit{
+    display:flex;align-items:center;gap:12px;background:#F9FAFB;border-radius:12px;padding:10px 12px;
+    border:1px solid #EDEFF2;
+  }
+  .pv-habit .pv-icon{font-size:22px;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;flex:none}
+  .pv-habit .pv-name{font-size:14px;font-weight:600;color:var(--muted)}
+
+  /* 奖杯解锁弹窗 */
+  .modal-mask{
+    position:fixed;inset:0;background:rgba(17,24,39,.55);z-index:100;
+    display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;
+  }
+  .modal-mask.show{opacity:1;pointer-events:auto}
+  .modal{
+    background:#fff;border-radius:22px;padding:30px 26px;text-align:center;max-width:320px;width:88%;
+    transform:scale(.8);transition:transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .modal-mask.show .modal{transform:scale(1)}
+  .modal .m-icon{font-size:64px;animation:bounceTrophy 1s infinite}
+  @keyframes bounceTrophy{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .modal .m-title{font-size:20px;font-weight:800;margin-top:10px;color:var(--text)}
+  .modal .m-sub{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.7}
+  .modal .m-btn{
+    margin-top:18px;border:none;cursor:pointer;font-family:inherit;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    padding:10px 26px;border-radius:12px;transition:background .2s ease;
+  }
+  .modal .m-btn:hover{background:var(--accent-dark)}
 
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:99}
 
   @media (max-width:400px){
     .week{display:none}
+    .emoji-grid .eg-grid{grid-template-columns:repeat(7,1fr)}
   }
 </style>
 </head>
@@ -197,9 +284,12 @@
       </div>
     </header>
 
+    <div class="quote" id="quoteBanner"></div>
+
     <nav class="tabs">
       <button class="tab active" data-page="home">🏠 主页</button>
       <button class="tab" data-page="stats">📊 统计</button>
+      <button class="tab" data-page="achieve">🏆 成就</button>
     </nav>
 
     <main id="pageHome" class="page active">
@@ -210,15 +300,32 @@
       <div id="statsContent"></div>
     </main>
 
+    <main id="pageAch" class="page">
+      <div id="achContent"></div>
+    </main>
+
     <form class="add" id="addForm">
       <div class="add-inner">
-        <div class="add-row">
-          <input id="newName" type="text" placeholder="添加新习惯，如：冥想、阅读" maxlength="12" autocomplete="off" />
-          <button type="submit" aria-label="添加">＋</button>
+        <div class="add-card">
+          <div class="add-row">
+            <button type="button" class="emoji-btn" id="emojiToggle" aria-label="选择表情">😀</button>
+            <input id="newName" type="text" placeholder="输入习惯名，或先选个表情…" maxlength="12" autocomplete="off" />
+            <button type="submit" class="add-btn"><span class="plus">＋</span>添加</button>
+          </div>
+          <div class="emoji-grid" id="emojiGrid"></div>
+          <div class="add-preview" id="addPreview"></div>
         </div>
-        <div class="emoji-picker" id="emojiPicker"></div>
       </div>
     </form>
+  </div>
+
+  <div class="modal-mask" id="trophyModal">
+    <div class="modal">
+      <div class="m-icon" id="mIcon">🏆</div>
+      <div class="m-title" id="mTitle">解锁成就！</div>
+      <div class="m-sub" id="mSub"></div>
+      <button class="m-btn" id="mClose">太棒了 🎉</button>
+    </div>
   </div>
 
   <canvas id="confetti"></canvas>
@@ -227,32 +334,426 @@
 (function () {
   'use strict';
   var KEY = 'habit-tracker-v1';
-  var EMOJIS = ['📖','💪','🚭','💧','🌙','📚','🧘','🏃','🥗','✍️','🎸','💊'];
   var COLORS = ['#10B981','#3B82F6','#F59E0B','#8B5CF6','#EF4444','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
+  var MILESTONES = [
+    { days: 21,  icon: '🥉', name: '习惯萌芽' },
+    { days: 50,  icon: '🥈', name: '渐入佳境' },
+    { days: 100, icon: '🥇', name: '百炼成钢' },
+    { days: 150, icon: '🏆', name: '持之以恒' },
+    { days: 210, icon: '👑', name: '王者坚持' }
+  ];
 
   var habits = load();
   var selectedEmoji = '';
   var currentPage = 'home';
+  var unlockedNow = [];
+
+  /* ================= 365 条不重复励志语录 ================= */
+  var QUOTES = [
+    "坚持不是长跑，而是每天一次小小的开始。",
+    "今天的汗水，是明天的勋章。",
+    "不要小看每天的一小步，积少成多就是远方。",
+    "习惯是慢慢长出来的树，浇水就能长大。",
+    "你有多自律，就有多自由。",
+    "再远的路，走着走着也就近了。",
+    "别让今天的懒惰，成为明天的遗憾。",
+    "每一次打卡，都是给未来的自己写信。",
+    "坚持下去，不是因为看到希望，而是坚持了才有希望。",
+    "种一棵树最好的时间是十年前，其次是现在。",
+    "生活不会辜负每一个认真的人。",
+    "你现在的努力，藏着你未来的样子。",
+    "水滴石穿，不是水的力量，而是坚持的力量。",
+    "今天不想跑，所以才去跑。",
+    "所有的不可能，都是还没坚持到可能。",
+    "把每天的小事做好，大事自然水到渠成。",
+    "自律给人自由，坚持给人力量。",
+    "不要问结果，先问自己今天做了没有。",
+    "每一个清晨都是新的起跑线。",
+    "你坚持的东西，总有一天会反过来拥抱你。",
+    "成功的路上并不拥挤，因为坚持的人不多。",
+    "每天进步 1%，一年后就是 37 倍的自己。",
+    "微小而持续的努力，胜过一切豪言壮语。",
+    "习惯的力量，在于日复一日。",
+    "先完成，再完美。",
+    "行动是治愈焦虑最好的良药。",
+    "想都是问题，做才有答案。",
+    "把目标写下来，把行动做起来。",
+    "不要等待完美的时机，现在就是最好的时机。",
+    "专注当下，未来自会到来。",
+    "今天的你，比昨天好一点点就够了。",
+    "坚持的意义，藏在每一天的重复里。",
+    "别怕慢，就怕站。",
+    "路虽远，行则将至；事虽难，做则必成。",
+    "每一次打卡，都是在雕刻更好的自己。",
+    "优秀是一种习惯，不是一种天赋。",
+    "你如何度过一天，就如何度过一生。",
+    "小事坚持做，就是了不起。",
+    "把平凡的事做好，就是不平凡。",
+    "向前走，别回头，路在脚下。",
+    "相信自己，你比你想象的更强大。",
+    "汗水不会骗人，付出终有回报。",
+    "每一天都是新的机会，把握住它。",
+    "坚持是一种选择，选择更好的自己。",
+    "好习惯是人生的复利。",
+    "今天种下的因，是明天收获的果。",
+    "你偷过的懒，都会变成打脸的巴掌。",
+    "别在最该奋斗的年纪，选择了安逸。",
+    "咬牙坚持的样子，真的很酷。",
+    "慢慢来，比较快。",
+    "日拱一卒，功不唐捐。",
+    "把简单的事重复做，你就是专家。",
+    "没有白走的路，每一步都算数。",
+    "凌晨的灯光，会照亮未来的路。",
+    "你的坚持，终将美好。",
+    "奋斗的青春最美丽。",
+    "不想认输，就拼命努力。",
+    "成功就是跌倒后，再站起来一次。",
+    "永远不要低估一颗坚持的心。",
+    "奇迹，不过是努力的另一个名字。",
+    "时间会证明，坚持有多值。",
+    "与其羡慕别人，不如逼自己一把。",
+    "做自己的太阳，无需凭借谁的光。",
+    "努力到无能为力，拼搏到感动自己。",
+    "人生没有白费的努力。",
+    "坚持打卡，就是最好的自我投资。",
+    "别让坏习惯偷走你的时间。",
+    "好习惯，是送给未来的礼物。",
+    "每天迈出一小步，累积成一大步。",
+    "你的习惯，决定了你的高度。",
+    "把今天过好，明天不会差。",
+    "每一次坚持，都在给梦想充电。",
+    "不积跬步，无以至千里。",
+    "稳住，我们能赢。",
+    "坚持的人，运气都不会太差。",
+    "别回头，往前走，光在前面。",
+    "真正的自律，是享受坚持的过程。",
+    "心之所向，素履以往。",
+    "把日子过成诗，把习惯坚持到底。",
+    "所有的美好，都值得等待。",
+    "你付出的努力，时间都记得。",
+    "别让借口，成为放弃的理由。",
+    "给自己一个承诺，然后去兑现。",
+    "坚持是最长情的告白。",
+    "日复一日的坚持，终会惊艳时光。",
+    "脚踏实地，仰望星空。",
+    "人生的答案，藏在坚持里。",
+    "不放弃，就是最好的开始。",
+    "每一次打卡，都是与自己的约定。",
+    "你今天的坚持，是明天的底气。",
+    "坚持的人，眼里有光。",
+    "慢慢变好，才是给自己最好的礼物。",
+    "再坚持一下，曙光就在前方。",
+    "把抱怨的时间，用来行动。",
+    "每天叫醒你的，应该是梦想。",
+    "别把最好的时光，浪费在犹豫上。",
+    "坚持做好每一件小事。",
+    "你的努力，值得被看见。",
+    "加油，你能行！",
+    "今日事，今日毕。",
+    "好习惯，成就好人生。",
+    "别放弃，胜利就在前方。",
+    "每一次的坚持，都是一次成长。",
+    "自律的人，自带光芒。",
+    "成功的秘诀，就是坚持到底。",
+    "把坚持变成习惯，把习惯变成自然。",
+    "你想要的，时间都会给你。",
+    "坚持的意义，在于遇见更好的自己。",
+    "别怕辛苦，怕的是半途而废。",
+    "每天进步一点点，坚持带来大改变。",
+    "优秀的你，正在路上。",
+    "把今天做到最好，明天自然更好。",
+    "坚持，是给自己最好的鼓励。",
+    "你今天的坚持，终会开花结果。",
+    "路是自己走出来的，坚持就是方向。",
+    "别让一时的懒惰，毁掉长期的坚持。",
+    "持之以恒，金石可镂。",
+    "每一天的打卡，都是向梦想靠近一步。",
+    "你有多努力，就有多幸运。",
+    "坚持的路上，并不孤单。",
+    "把简单做到极致，就是成功。",
+    "别放弃，你离目标只差一步。",
+    "好的习惯，是一生的财富。",
+    "每天坚持，未来可期。",
+    "你的坚持，终将闪耀。",
+    "别怕慢，坚持就是胜利。",
+    "把自律刻进骨子里。",
+    "人生没有捷径，坚持就是捷径。",
+    "每一次的努力，都算数。",
+    "坚持，让平凡变得不平凡。",
+    "今天的你，正在为明天铺路。",
+    "别停下，风景就在前方。",
+    "好习惯，是最好的朋友。",
+    "坚持打卡，遇见更好的自己。",
+    "你的每一天，都在改变未来。",
+    "别让梦想只是梦想，行动起来。",
+    "坚持的人，永远年轻。",
+    "把坚持变成一种享受。",
+    "日积月累，终成大器。",
+    "别怕失败，怕的是不再尝试。",
+    "每一次坚持，都是一次胜利。",
+    "你的努力，时光不负。",
+    "坚持，是最好的答案。",
+    "把今天过成你想要的样子。",
+    "别犹豫，现在就行动。",
+    "坚持，让梦想照进现实。",
+    "每天一小步，成就一大步。",
+    "你的坚持，值得喝彩。",
+    "别放弃，美好在前方等你。",
+    "把习惯坚持到底，你就是赢家。",
+    "自律，是最顶级的自由。",
+    "坚持，是一种态度。",
+    "别让今天的懈怠，成为明天的遗憾。",
+    "每一次打卡，都是一次承诺。",
+    "你今天的坚持，是明天的骄傲。",
+    "坚持的人，运气不会差。",
+    "把简单的事，坚持做下去。",
+    "别怕难，坚持就是胜利。",
+    "好习惯，是最好的投资。",
+    "每一天的坚持，都算数。",
+    "你的努力，终会开花。",
+    "坚持，遇见更好的自己。",
+    "别停下，前方有光。",
+    "把坚持，变成生活的习惯。",
+    "你有多自律，就有多优秀。",
+    "坚持的路上，每一步都算数。",
+    "别放弃，你值得更好的。",
+    "每一次打卡，都是成长的印记。",
+    "你今天的坚持，是未来的底气。",
+    "坚持，让一切皆有可能。",
+    "把今天做好，明天不会差。",
+    "别怕累，坚持就是胜利。",
+    "熬过无人问津的日子，才有诗和远方。",
+    "坚持，是最好的自我投资。",
+    "每天进步，从不间断。",
+    "别让犹豫，耽误了行动。",
+    "坚持打卡，未来可期。",
+    "你今天的努力，是明天的收获。",
+    "把自律，变成一种本能。",
+    "坚持，是一种力量。",
+    "别怕慢，稳扎稳打。",
+    "你的坚持，值得骄傲。",
+    "把每一天，都过成值得纪念的日子。",
+    "坚持的人，自带光芒。",
+    "别放弃，黎明就在前方。",
+    "好习惯，改变一生。",
+    "每一天的坚持，都是向梦想靠近。",
+    "你有多坚持，就有多出色。",
+    "把简单的事重复做，就是不简单。",
+    "坚持，让平凡闪耀。",
+    "别怕苦，苦尽甘来。",
+    "你的努力，终有回报。",
+    "坚持，是最好的老师。",
+    "把今天的事，今天做完。",
+    "别让懒惰，成为习惯。",
+    "坚持打卡，就是最好的自律。",
+    "你今天的坚持，是明天的资本。",
+    "把每一天，都当作新的开始。",
+    "别停下，梦想在前方等你。",
+    "坚持，是一种选择。",
+    "你的坚持，终将不负。",
+    "把好习惯，坚持到底。",
+    "别怕难，难才有意义。",
+    "每一次坚持，都是一次超越。",
+    "你今天的努力，照亮明天的路。",
+    "坚持，让生活更美好。",
+    "把每一天，都活得精彩。",
+    "别放弃，成功就在不远处。",
+    "你的坚持，是最好的证明。",
+    "坚持，是通往梦想的路。",
+    "把自律，融入生活。",
+    "别怕慢，只要不停下。",
+    "你今天的坚持，是明天的财富。",
+    "坚持，是最美的姿态。",
+    "把简单的事做好，就不简单。",
+    "别让三分钟热度，毁掉好习惯。",
+    "坚持打卡，遇见更自律的自己。",
+    "你有多努力，未来就有多好。",
+    "把每一天，都当成礼物。",
+    "别放弃，坚持就是胜利。",
+    "你的坚持，终会发光。",
+    "坚持，是最好的习惯。",
+    "把今天，过成你想要的样子。",
+    "别怕累，累是成长的代价。",
+    "你今天的付出，是明天的收获。",
+    "坚持，让梦想不再遥远。",
+    "把好习惯，变成生活方式。",
+    "别犹豫，行动是最好的答案。",
+    "坚持的人，最美。",
+    "你的努力，不会被辜负。",
+    "把每一天，都过得有意义。",
+    "别放弃，前方就是黎明。",
+    "坚持，是给自己的礼物。",
+    "半山腰太挤，去山顶看看。",
+    "把自律，变成习惯。",
+    "星光不问赶路人，时光不负有心人。",
+    "你所坚持的，终会成为你的铠甲。",
+    "坚持，是最好的状态。",
+    "把每一天，都当作新的起点。",
+    "别让借口，偷走你的坚持。",
+    "你今天的努力，是明天的实力。",
+    "坚持，让平凡变得伟大。",
+    "把好习惯，坚持下去。",
+    "别停下，路就在脚下。",
+    "你的坚持，值得被奖励。",
+    "坚持，是通往成功的关键。",
+    "把每一天，都过得充实。",
+    "别怕慢，就怕停。",
+    "你今天的付出，终有回响。",
+    "坚持，是一种修行。",
+    "把自律，变成日常。",
+    "别放弃，你的坚持有意义。",
+    "你的努力，时间会证明。",
+    "坚持，是最长情的陪伴。",
+    "把每一天，都过成诗。",
+    "别怕难，难不倒坚持的人。",
+    "你今天的坚持，是明天的光芒。",
+    "坚持，让生活充满可能。",
+    "把好习惯，融入每一天。",
+    "别让一时冲动，毁掉长期坚持。",
+    "你的坚持，终会开花结果。",
+    "坚持，是最好的自己。",
+    "把每一天，都当成最后一次机会。",
+    "别停下，梦想在前方。",
+    "你今天的努力，是明天的基石。",
+    "坚持，让一切值得。",
+    "把自律，进行到底。",
+    "路要一步一步走，饭要一口一口吃。",
+    "你的坚持，值得尊敬。",
+    "坚持，是最美的风景。",
+    "把每一天，都过好。",
+    "别放弃，你就是自己的英雄。",
+    "你今天的坚持，是明天的回忆。",
+    "坚持，让梦想有力量。",
+    "把好习惯，坚持成自然。",
+    "别怕慢，坚持就有希望。",
+    "你的努力，终将被看见。",
+    "每一次自律，都是对未来的投资。",
+    "把每一天，都当作新的挑战。",
+    "别停下，前方有更好的自己。",
+    "别让今天的舒适，透支明天的自由。",
+    "坚持，让平凡的日子发光。",
+    "把自律，变成热爱。",
+    "习惯成自然，坚持成习惯。",
+    "你的坚持，终会闪耀。",
+    "坚持，是最长久的陪伴。",
+    "把每一天，都过得值得。",
+    "别放弃，美好会不期而遇。",
+    "你今天的努力，是明天的幸运。",
+    "坚持，让未来更清晰。",
+    "走好选择的路，别只选好走的路。",
+    "别怕累，累并快乐着。",
+    "你的坚持，是最好的名片。",
+    "坚持，让一切成为可能。",
+    "把努力当习惯，把优秀当日常。",
+    "别停下，路在脚下。",
+    "你今天的坚持，是明天的勋章。",
+    "坚持，是最动人的故事。",
+    "把自律，变成一种享受。",
+    "别怕难，难的是不开始。",
+    "你的努力，终有归处。",
+    "坚持，让生活更自律。",
+    "把每一天，都当作礼物。",
+    "别放弃，你的坚持有人懂。",
+    "你今天的坚持，是明天的起点。",
+    "日复一日的重复，是通往卓越的路。",
+    "把好习惯，坚持成生活。",
+    "别怕慢，慢工出细活。",
+    "你的坚持，终将伟大。",
+    "坚持，让梦想有回声。",
+    "把每一天，都过得充实有意义。",
+    "别停下，前方就是光明。",
+    "你今天的努力，是明天的骄傲。",
+    "坚持，是最有力的行动。",
+    "把自律，变成日常习惯。",
+    "你只管努力，剩下的交给时间。",
+    "自律的苦，会变成自信的光。",
+    "坚持，让平凡闪闪发光。",
+    "把每一天，都当成新的开始。",
+    "别放弃，你就是奇迹。",
+    "撑过去，就是另一片天。",
+    "坚持，是最美好的品质。",
+    "平凡的坚持，铸就不平凡的人生。",
+    "别怕累，累是成长的证明。",
+    "你的努力，终将开花。",
+    "坚持，让未来可期。",
+    "把每一天，都活得漂亮。",
+    "别停下，梦想在等你。",
+    "你今天的坚持，是明天的力量。",
+    "坚持，是最好的投资。",
+    "把自律，变成一种习惯。",
+    "别怕难，难不倒有心人。",
+    "今天的自律，是明天自由的前提。",
+    "坚持，是通往远方的路。",
+    "把每一天，都过得有温度。",
+    "别放弃，好日子在后面。",
+    "你今天的努力，是明天的阳光。",
+    "坚持，让一切刚刚好。",
+    "把好习惯，坚持成经典。",
+    "别怕慢，每一步都算数。",
+    "你的坚持，是最好的故事。",
+    "坚持，让梦想发光。",
+    "把每一天，都当作最好的礼物。",
+    "别停下，前方有惊喜。",
+    "把每一天都当作向上攀登的台阶。",
+    "坚持，是最长情的告白。",
+    "把自律，坚持到底。",
+    "你的坚持里，藏着你的未来。",
+    "你的努力，终有回响。",
+    "坚持，让平凡不平凡。",
+    "把每一天，都过得热气腾腾。",
+    "别放弃，你离成功只差一步。",
+    "再小的努力，乘以365都很可观。",
+    "别让三分钟的热情，毁了长久的坚持。",
+    "把好习惯，坚持成信仰。",
+    "别怕累，累并成长着。",
+    "你的坚持，终将与众不同。",
+    "坚持，让生活有光。",
+    "把每一天，都当作恩赐。",
+    "别停下，路在脚下延伸。",
+    "你今天的努力，是明天的底气。",
+    "坚持，是最有力的回答。",
+    "把自律，变成生活的底色。",
+    "行动，是对梦想最好的回答。",
+    "你的坚持，终将开花。",
+    "坚持，让梦想有了翅膀。",
+    "把每一天，都过得精彩纷呈。",
+    "好习惯是慢慢养成的，别急。",
+    "坚持到最后一刻，你就是赢家。",
+    "坚持，是最好的修行。",
+    "把好习惯，坚持成人生。",
+    "别怕慢，慢就是快。",
+    "你的努力，终将被岁月铭记。",
+    "坚持，让一切值得期待。",
+    "把每一天，都当作新的希望。",
+    "别停下，前方就是黎明。",
+    "你今天的坚持，是明天的传奇。",
+    "坚持，是最动人的力量。",
+    "把自律，进行到生命的每一天。",
+    "别怕难，难不倒坚持的你。",
+    "你的坚持，终将美好如初。"
+  ];
+
+  /* ================= 超全 emoji 表情库 ================= */
+  var EMOJIS = [
+    '😀','😁','😂','🤣','😊','😇','🙂','😉','😍','🥰','😘','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','😐','😑','😶','😏','😒','🙄','😬','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','💩','🤡','👻','👽','🤖','😺','😸','😹','😻','😼','🙀','👋','🤚','🖐','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🤝','🙏','💪','🦾','✍️','💅','🤳','🦵','🦶','👂','👃','🧠','🦷','👀','👅','👄','💋','💖','💗','💓','💞','💕','💟','❣️','💔','❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💯','💢','💥','💫','💦','💨','🕳','💬','💭','🗯','👁','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🦋','🐌','🐞','🐜','🦗','🕷','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🐘','🦒','🐪','🐫','🦘','🐃','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐈','🦃','🦚','🦜','🕊','🐇','🦝','🦨','🦥','🦦','🐀','🐿','🦔','🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶','🌽','🥕','🥔','🍠','🥐','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🍔','🍟','🍕','🥪','🥙','🌮','🌯','🥗','🥘','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','☕️','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🏓','🏸','🏒','🏑','🥍','🏏','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸','🥌','🎿','⛷','🏂','🏃','🏋️','🤸','🤺','🤾','🏌','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖','🏵','🎗','🎫','🎟','🎪','🤹','🎭','🩰','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🎲','♟','🎯','🎳','🎮','🎰','🧩','🧸','🪀','🪄','🪆','🎈','🎁','🎀','🪅','🪡','🧵','🪢','🧶','🔮','🪬','🧿','📿','💎','🪙','💍','🪝','🧨','💣','🧯','🛒','🛍','🧺','🧻','🚽','🚿','🛁','🧼','🪥','🪒','🧽','🧴','🪣','🪤','🧹','🪟','🛏','🪑','🛋','🪑','🔑','🗝','🚪','🪞','🖼','🛎','🧭','⏱','⏰','⌚️','📱','📲','💻','⌨️','🖥','🖨','🖱','🖲','💽','💾','💿','📀','📼','📷','📸','📹','🎥','📽','🎞','📞','☎️','📟','📠','📺','📻','🎙','🎚','🎛','🧮','📻','📡','🔋','🔌','💡','🔦','🕯','🪔','🧯','🗑','🛢','💸','💵','💴','💶','💷','🪙','💰','💳','💎','⚖️','🧰','🪛','🔧','🔨','⚒','🛠','⛏','🪚','🔩','⚙️','🪤','🧲','🔫','💣','🧨','🪓','🔪','🗡','⚔️','🛡','🚬','⚰️','🪦','⚱️','🏺','🔮','📿','🧿','🪬','💈','⚗️','🔭','🔬','🕳','💊','💉','🩸','🦠','🧬','🩺','🌡','🩹','🩻','🩼','🧪','🧫','🧬','🔬','🔭','📡','🗺','🧭','⛰','🏔','🗻','🌋','🗾','🏕','🏖','🏜','🏝','🏞','🏟','🏛','🏗','🧱','🪨','🪵','🛖','🏘','🏚','🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏩','🏪','🏫','🏬','🏭','🏯','🏰','💒','🗼','🗽','⛪','🕌','🕍','⛩','🕋','⛲','⛺','🌁','🌃','🏙','🌄','🌅','🌆','🌇','🌉','♨️','🌌','🎠','🎡','🎢','💈','🎪','🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔','🚕','🚖','🚗','🚘','🚙','🚚','🚛','🚜','🏎','🏍','🛵','🦽','🦼','🛺','🚲','🛴','🛹','🚏','🛣','🛤','🛢','⛽','🚨','🚥','🚦','🛑','🚧','⚓','⛵','🚤','🛳','⛴','🛥','🚢','✈️','🛩','🛫','🛬','🪂','💺','🚁','🚟','🚠','🚡','🛰','🚀','🛸','🪐','🌍','🌎','🌏','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🌙','🌚','🌝','🌛','🌜','☀️','🌞','🪐','⭐','🌟','🌠','☁️','⛅','⛈','🌤','🌥','🌦','🌧','🌨','🌩','🌪','🌫','🌬','🌀','🌈','☂️','☔','⚡','❄️','☃️','⛄','☄️','🔥','💧','🌊','🎃','🎄','🎆','🎇','🧨','✨','🎈','🎉','🎊','🎋','🎍','🎎','🎏','🎐','🎑','🧧','🎀','🎁','🎗','🎟','🎫','🎖','🏆','🏅','🥇','🥈','🥉','⚽','⚾','🏀','🏐','🏈','🎾','🏉','🎱','🏓','🏸','🥅','🏒','🏑','🏏','⛳','🏹','🎣','🥊','🥋','🎽','⛸','🥌','🛷','🎿','⛷','🏂','🪂','🏋️','🤼','🤸','🤺','🤾','🏌','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖','🏵','🎗','🎫','🎟','🎪','🤹','🎭','🩰','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🎲','♟','🎯','🎳','🎮','🎰','🧩','📚','📖','📕','📗','📘','📙','📔','📒','📓','📃','📜','📄','📰','🗞','📑','🔖','🏷','✏️','✒️','🖋','🖊','🖌','🖍','📝','📌','📍','📎','🖇','📏','📐','✂️','🗃','🗄','🗑','🔒','🔓','🔏','🔐','🔑','🗝','🔨','🪓','⛏','⚒','🛠','🗡','⚔','🔫','🏹','🛡','🚬','⚰','🧿','🔮','📿','💈','⚗','🔭','🔬','🕳','💊','💉','🩸','🩹','🩺','🩻','🦠','🧬','🧪','🧫','🔬','🔭','📡'
+  ];
+  var EMOJI_NAMES = {
+    '📖':'读书','📚':'阅读','💪':'健身','🏋️':'健身','🏃':'跑步','🚶':'散步','🚴':'骑行','🚵':'骑行','🏊':'游泳','🧘':'冥想','🏸':'打羽毛球','🏀':'打篮球','⚽':'踢足球','🎾':'打网球','🏓':'打乒乓球','🎱':'打台球','🥊':'拳击','🤸':'锻炼','🏄':'冲浪','⛷':'滑雪','🏂':'滑雪','🥾':'徒步','🧗':'攀岩','🏹':'射箭','🎣':'钓鱼','⛹️':'打球','🤽':'水球','🚣':'划船','🏌':'打高尔夫','🥋':'武术','💧':'喝水','🥤':'喝水','☕️':'喝咖啡','🍵':'喝茶','🥛':'喝牛奶','🍎':'吃苹果','🥗':'健康饮食','🍽️':'好好吃饭','🥦':'吃蔬菜','🌙':'早睡','🌅':'早起','😴':'早睡','💤':'早睡','🚭':'戒烟','🍺':'戒酒','🚬':'戒烟','📱':'少玩手机','💻':'少用电脑','🎮':'少打游戏','⌚️':'准时','⏰':'早起','💊':'吃药','🩺':'体检','🧠':'学习','📝':'写日记','✍️':'写字','🖊':'写作','🖌':'画画','🎨':'画画','🎸':'弹吉他','🎹':'弹钢琴','🎻':'拉小提琴','🥁':'打鼓','🎤':'唱歌','🎧':'听音乐','🎼':'练琴','📷':'摄影','🎥':'拍视频','✏️':'练字','🗣':'练习口语','🔤':'背单词','📈':'理财','💰':'存钱','💸':'记账','🏦':'存钱','💳':'记账','🧹':'打扫','🧺':'洗衣服','🛁':'泡澡','🪥':'刷牙','🧼':'洗手','🌱':'养绿植','🪴':'养植物','🐱':'养猫','🐶':'遛狗','🌿':'环保','♻️':'环保','🚮':'垃圾分类','💡':'学习','🧩':'拼图','♟':'下棋','🎲':'玩桌游','🧘‍♀️':'冥想','🏠':'整理房间','🛏':'整理床铺','📦':'整理收纳','🛒':'购物','🍳':'做饭','🥘':'做饭','👨‍🍳':'学做菜','🧁':'烘焙','🎂':'做蛋糕','🧹':'打扫卫生','🗑':'扔垃圾','🚿':'洗澡','🧴':'护肤','💄':'化妆','💅':'美甲','💆':'按摩','🦷':'刷牙','👁':'护眼','🙈':'少看手机','🎓':'学习','📕':'读书','📗':'阅读','📘':'阅读','📙':'阅读','📒':'记笔记','📓':'记笔记','🗞':'读新闻','📰':'看新闻','🔖':'做笔记','🏷':'整理标签','📌':'做计划','📏':'规划','🔭':'观星','🔬':'做实验','🌡':'量体温','💉':'打针','🧬':'研究','🦠':'讲卫生','🌍':'学地理','🌏':'学地理','🚀':'学航天','🪐':'学天文','⭐':'许愿','🌟':'许愿','🌠':'看星空','🌈':'保持好心情','🔥':'坚持','✨':'坚持','🎯':'定目标','🎖':'争取荣誉','🏅':'争取奖牌','🎗':'做公益','💖':'爱自己','❤️':'爱自己','🧡':'保持热情','💛':'保持乐观','💚':'环保','💙':'保持平静','💜':'保持优雅','🌷':'养花','🌸':'赏花','🌻':'晒太阳','🍃':'亲近自然','🕊':'和平','🐬':'爱护动物','🐳':'爱护海洋','🦋':'亲近自然','🍀':'好运','🌼':'好心情','🍂':'散步','❄️':'冬泳','☀️':'晒太阳','🌤':'散步','🌧':'听雨','🍵':'喝茶','🍓':'吃水果','🥝':'吃水果','🍊':'补充维C','🍋':'喝柠檬水','🥒':'敷面膜','🧊':'冰敷','🍫':'控制甜食','🍩':'控制甜食','🍬':'戒糖','🧁':'戒甜食','🍟':'少吃油炸','🍔':'少吃快餐','🥓':'少吃肉','🍖':'少吃肉','🥩':'均衡饮食','🍗':'均衡饮食','🥚':'吃鸡蛋','🍞':'吃早餐','🥐':'吃早餐','🥛':'补钙','🧀':'补钙','🫖':'泡茶','🥢':'用筷子','🍜':'吃面','🍲':'喝汤','🍛':'吃咖喱','🍣':'吃寿司','🍱':'吃便当','🥟':'包饺子','🍤':'吃虾','🍙':'吃饭团','🍚':'好好吃饭','🍘':'吃米饼','🍥':'吃鱼板','🥠':'吃幸运饼','🥮':'吃月饼','🍢':'吃串','🍡':'吃丸子','🍧':'吃冰','🍨':'吃冰淇淋','🍦':'吃冰淇淋','🥧':'吃派','🧁':'吃纸杯蛋糕','🍰':'吃蛋糕','🎂':'庆祝','🍮':'吃布丁','🍭':'吃棒棒糖','🍬':'吃糖','🍫':'吃巧克力','🍿':'吃爆米花','🍩':'吃甜甜圈','🍪':'吃饼干','🌰':'吃坚果','🥜':'吃花生','🍯':'吃蜂蜜','🍌':'吃香蕉','🍉':'吃西瓜','🍇':'吃葡萄','🍓':'吃草莓','🍑':'吃桃子','🍍':'吃菠萝','🥥':'吃椰子','🥝':'吃猕猴桃','🍅':'吃番茄','🥑':'吃牛油果','🥦':'吃西兰花','🥬':'吃蔬菜','🥒':'吃黄瓜','🌽':'吃玉米','🥕':'吃胡萝卜','🥔':'吃土豆','🍠':'吃红薯','🍊':'吃橘子','🍋':'吃柠檬','🍐':'吃梨','🍏':'吃苹果','🍎':'吃苹果','🧃':'喝果汁','🧋':'喝奶茶','🥤':'喝饮料','🍺':'少喝啤酒','🍻':'少喝酒','🥂':'少喝酒','🍷':'少喝红酒','🥃':'少喝酒','🍸':'少喝酒','🍹':'少喝饮料','🧉':'喝马黛茶','🍾':'少喝香槟'
+  };
+  function emojiDefaultName(em) { return EMOJI_NAMES[em] || ''; }
 
   /* ---------- 工具 ---------- */
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   function pad(n) { return String(n).padStart(2, '0'); }
-  function dateStr(d) {
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  }
+  function dateStr(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function todayStr() { return dateStr(new Date()); }
-  function daysAgo(n) {
-    var d = new Date();
-    d.setDate(d.getDate() - n);
-    return d;
-  }
+  function daysAgo(n) { var d = new Date(); d.setDate(d.getDate() - n); return d; }
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  function dayNum(k) { var p = k.split('-').map(Number); return Date.UTC(p[0], p[1] - 1, p[2]) / 86400000; }
 
   /* ---------- 数据 ---------- */
   function defaults() {
@@ -272,18 +773,19 @@
       if (raw) {
         var data = JSON.parse(raw);
         if (data && Array.isArray(data.habits)) {
-          return data.habits.map(function (h) {
-            h.history = h.history || {};
-            return h;
-          });
+          var h = data.habits.map(function (x) { x.history = x.history || {}; return x; });
+          h.unlocks = data.unlocks || {};
+          return h;
         }
       }
     } catch (e) { /* ignore */ }
-    return defaults();
+    var d = defaults();
+    d.unlocks = {};
+    return d;
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ version: 1, habits: habits })); }
-    catch (e) { /* storage full or blocked */ }
+    var data = { version: 1, habits: habits, unlocks: habits.unlocks };
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
   }
 
   function isDone(h) { return !!h.history[todayStr()]; }
@@ -292,78 +794,54 @@
     habits.forEach(function (h) { if (h.history[t]) n++; });
     return n;
   }
-  function streak(h) {
+  function currentStreak(h) {
     var n = 0, d = new Date();
     if (!h.history[dateStr(d)]) d.setDate(d.getDate() - 1);
     while (h.history[dateStr(d)]) { n++; d.setDate(d.getDate() - 1); }
     return n;
+  }
+  function longestStreak(h) {
+    var days = [];
+    Object.keys(h.history).forEach(function (k) { if (h.history[k]) days.push(k); });
+    days.sort(function (a, b) { return dayNum(a) - dayNum(b); });
+    var best = { length: 0, end: null }, run = 0;
+    for (var i = 0; i < days.length; i++) {
+      if (i > 0 && dayNum(days[i]) - dayNum(days[i - 1]) === 1) run++;
+      else run = 1;
+      if (run > best.length) { best.length = run; best.end = days[i]; }
+    }
+    return best;
   }
   function weekDone(h) {
     var t = todayStr(), n = 0;
     for (var i = 0; i < 7; i++) { if (h.history[dateStr(daysAgo(i))]) n++; }
     return n;
   }
-  function pickIcon(name) {
-    var map = [
-      ['单词', '📖'], ['英语', '📖'], ['背', '📖'],
-      ['健身', '💪'], ['运动', '💪'], ['锻炼', '💪'],
-      ['烟', '🚭'],
-      ['水', '💧'],
-      ['睡', '🌙'], ['早起', '🌅'],
-      ['读', '📚'],
-      ['冥想', '🧘'],
-      ['跑', '🏃'],
-      ['吃', '🥗'], ['饮食', '🥗'], ['沙拉', '🥗'],
-      ['写', '✍️'], ['日记', '✍️'],
-      ['琴', '🎸'], ['吉他', '🎸'],
-      ['药', '💊'], ['维生素', '💊']
-    ];
-    for (var i = 0; i < map.length; i++) {
-      if (name.indexOf(map[i][0]) !== -1) return map[i][1];
+  function overallStreak() {
+    if (habits.length === 0) return { length: 0, end: null };
+    var cand = null;
+    habits.forEach(function (h) {
+      var s = new Set();
+      Object.keys(h.history).forEach(function (k) { if (h.history[k]) s.add(k); });
+      if (cand === null) cand = s;
+      else cand = new Set(Array.from(cand).filter(function (k) { return s.has(k); }));
+    });
+    var days = Array.from(cand || []).sort(function (a, b) { return dayNum(a) - dayNum(b); });
+    var best = { length: 0, end: null }, run = 0;
+    for (var i = 0; i < days.length; i++) {
+      if (i > 0 && dayNum(days[i]) - dayNum(days[i - 1]) === 1) run++;
+      else run = 1;
+      if (run > best.length) { best.length = run; best.end = days[i]; }
     }
-    return '📌';
+    return best;
   }
 
-  /* ---------- 统计计算 ---------- */
-  function periodStarts() {
+  /* ---------- 今日语录 ---------- */
+  function todayQuote() {
     var now = new Date();
-    var weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // 周一为一周开始
-    weekStart.setHours(0, 0, 0, 0);
-    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    var yearStart = new Date(now.getFullYear(), 0, 1);
-    return { weekStart: weekStart, monthStart: monthStart, yearStart: yearStart, now: now };
-  }
-  function periodCounts(h) {
-    var s = periodStarts();
-    var w = 0, m = 0, y = 0;
-    Object.keys(h.history).forEach(function (dstr) {
-      if (!h.history[dstr]) return;
-      var parts = dstr.split('-');
-      if (parts.length !== 3) return;
-      var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      if (isNaN(d.getTime())) return;
-      if (d >= s.weekStart) w++;
-      if (d >= s.monthStart) m++;
-      if (d >= s.yearStart) y++;
-    });
-    return { w: w, m: m, y: y };
-  }
-  function monthTrend() {
-    var year = new Date().getFullYear();
-    var counts = new Array(12).fill(0);
-    habits.forEach(function (h) {
-      Object.keys(h.history).forEach(function (dstr) {
-        if (!h.history[dstr]) return;
-        var parts = dstr.split('-');
-        if (parts.length !== 3) return;
-        if (Number(parts[0]) === year) {
-          var mm = Number(parts[1]);
-          if (mm >= 1 && mm <= 12) counts[mm - 1]++;
-        }
-      });
-    });
-    return counts;
+    var start = new Date(now.getFullYear(), 0, 0);
+    var doy = Math.floor((now - start) / 86400000);
+    return QUOTES[doy % QUOTES.length];
   }
 
   /* ---------- 渲染：主页 ---------- */
@@ -371,6 +849,14 @@
   var dateEl = document.getElementById('dateLabel');
   var numEl = document.getElementById('progressNum');
   var ringEl = document.getElementById('ringFg');
+  var quoteEl = document.getElementById('quoteBanner');
+
+  function renderQuote() {
+    var os = overallStreak();
+    var streakTxt = os.length > 0 ? '🔥 全勤连续 ' + os.length + ' 天' : '🌱 从今天开始坚持';
+    quoteEl.innerHTML = '<div class="q-text">“' + todayQuote() + '”</div>' +
+      '<div class="q-meta"><span>💬 每日一语</span><span>' + streakTxt + '</span></div>';
+  }
 
   function render() {
     var t = todayStr();
@@ -379,12 +865,11 @@
     });
 
     if (sorted.length === 0) {
-      listEl.innerHTML =
-        '<div class="empty"><span class="big">🌱</span>还没有习惯<br>在下方添加第一个吧！</div>';
+      listEl.innerHTML = '<div class="empty"><span class="big">🌱</span>还没有习惯<br>在下方添加第一个吧！</div>';
     } else {
       listEl.innerHTML = sorted.map(function (h) {
         var done = !!h.history[t];
-        var st = streak(h);
+        var st = currentStreak(h);
         var wd = weekDone(h);
         var dots = '';
         for (var i = 6; i >= 0; i--) {
@@ -433,16 +918,12 @@
     var totals = { w: 0, m: 0, y: 0 };
     rows.forEach(function (r) { totals.w += r.w; totals.m += r.m; totals.y += r.y; });
 
-    var html = '';
-
-    // KPI 卡片
-    html += '<div class="kpis">' +
+    var html = '<div class="kpis">' +
       '<div class="kpi"><div class="num">' + totals.w + '</div><div class="label">本周完成</div><div class="sub">次数</div></div>' +
       '<div class="kpi"><div class="num">' + totals.m + '</div><div class="label">本月完成</div><div class="sub">次数</div></div>' +
       '<div class="kpi"><div class="num">' + totals.y + '</div><div class="label">今年完成</div><div class="sub">次数</div></div>' +
     '</div>';
 
-    // 明细表
     html += '<div class="card"><h3>📋 周 / 月 / 年 次数明细</h3><div class="hint">每个习惯在对应时间段内完成的打卡次数</div>';
     if (habits.length === 0) {
       html += '<div class="chart-empty">还没有任何习惯，先去主页添加吧</div>';
@@ -456,7 +937,6 @@
     }
     html += '</div>';
 
-    // 三个饼图
     var charts = [
       { key: 'w', title: '本周完成分布', tag: 'week', tagText: '周' },
       { key: 'm', title: '本月完成分布', tag: 'month', tagText: '月' },
@@ -468,7 +948,6 @@
       return '<div class="chart-box"><h4><span class="tag ' + c.tag + '">' + c.tagText + '</span>' + c.title + '</h4>' + donutHTML(items, totals[c.key], c.tagText) + '</div>';
     }).join('') + '</div>';
 
-    // 今年每月趋势（附加）
     var trend = monthTrend();
     var maxT = Math.max.apply(null, trend.concat([1]));
     html += '<div class="card"><h3>📈 今年每月完成趋势</h3><div class="hint">全部习惯合计，按月份统计</div><div class="month-bars">';
@@ -483,13 +962,44 @@
     statsEl.innerHTML = html;
   }
 
+  function periodCounts(h) {
+    var now = new Date();
+    var ws = new Date(now); ws.setDate(now.getDate() - ((now.getDay() + 6) % 7)); ws.setHours(0, 0, 0, 0);
+    var ms = new Date(now.getFullYear(), now.getMonth(), 1);
+    var ys = new Date(now.getFullYear(), 0, 1);
+    var w = 0, m = 0, y = 0;
+    Object.keys(h.history).forEach(function (dstr) {
+      if (!h.history[dstr]) return;
+      var p = dstr.split('-');
+      if (p.length !== 3) return;
+      var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+      if (isNaN(d.getTime())) return;
+      if (d >= ws) w++;
+      if (d >= ms) m++;
+      if (d >= ys) y++;
+    });
+    return { w: w, m: m, y: y };
+  }
+  function monthTrend() {
+    var year = new Date().getFullYear();
+    var counts = new Array(12).fill(0);
+    habits.forEach(function (h) {
+      Object.keys(h.history).forEach(function (dstr) {
+        if (!h.history[dstr]) return;
+        var p = dstr.split('-');
+        if (p.length !== 3) return;
+        if (Number(p[0]) === year) {
+          var mm = Number(p[1]);
+          if (mm >= 1 && mm <= 12) counts[mm - 1]++;
+        }
+      });
+    });
+    return counts;
+  }
   function donutHTML(items, total, label) {
-    if (total === 0 || items.length === 0) {
-      return '<div class="chart-empty">😴 该时间段还没有完成记录</div>';
-    }
+    if (total === 0 || items.length === 0) return '<div class="chart-empty">😴 该时间段还没有完成记录</div>';
     var R = 70, C = 2 * Math.PI * R;
-    var offset = 0;
-    var slices = '';
+    var offset = 0, slices = '';
     items.forEach(function (it, idx) {
       var color = COLORS[idx % COLORS.length];
       var len = C * it.value / total;
@@ -510,14 +1020,115 @@
         '<circle cx="90" cy="90" r="48" fill="#fff"/>' +
         '<text x="90" y="87" text-anchor="middle" class="donut-total">' + total + '</text>' +
         '<text x="90" y="105" text-anchor="middle" class="donut-label">' + label + '完成</text>' +
-      '</svg>' +
-      '<div class="legend">' + legend + '</div></div>';
+      '</svg><div class="legend">' + legend + '</div></div>';
   }
+
+  /* ---------- 渲染：成就页 ---------- */
+  var achEl = document.getElementById('achContent');
+
+  function renderAchievements() {
+    var os = overallStreak();
+    var bestHabit = null;
+    habits.forEach(function (h) {
+      var ls = longestStreak(h).length;
+      if (!bestHabit || ls > bestHabit.len) bestHabit = { habit: h, len: ls };
+    });
+
+    // 计算每个里程碑是否解锁
+    var derived = {};
+    MILESTONES.forEach(function (ms) {
+      var achivers = habits.filter(function (h) { return longestStreak(h).length >= ms.days; });
+      derived[ms.days] = achivers.map(function (h) { return h.id; });
+    });
+
+    // 检测新解锁
+    var newUnlocks = [];
+    MILESTONES.forEach(function (ms) {
+      if (derived[ms.days].length > 0 && !habits.unlocks[ms.days]) {
+        newUnlocks.push(ms);
+        habits.unlocks[ms.days] = { date: todayStr(), habits: derived[ms.days] };
+      }
+    });
+    if (newUnlocks.length > 0) save();
+
+    var unlockedCount = MILESTONES.filter(function (ms) { return derived[ms.days].length > 0; }).length;
+
+    var html = '<div class="kpis">' +
+      '<div class="kpi"><div class="num">' + os.length + '</div><div class="label">全勤最长</div><div class="sub">天</div></div>' +
+      '<div class="kpi"><div class="num">' + (bestHabit ? bestHabit.len : 0) + '</div><div class="label">最佳习惯</div><div class="sub">' + (bestHabit ? escapeHtml(bestHabit.habit.name) : '—') + '</div></div>' +
+      '<div class="kpi"><div class="num">' + unlockedCount + '/' + MILESTONES.length + '</div><div class="label">已解锁奖杯</div><div class="sub">个</div></div>' +
+    '</div>';
+
+    // 奖杯里程碑
+    html += '<div class="card"><h3>🏆 坚持奖杯</h3><div class="hint">同一个习惯连续打卡达到天数，自动解锁奖杯</div><div class="trophy-shelf">';
+    MILESTONES.forEach(function (ms) {
+      var achivers = derived[ms.days];
+      var unlocked = achivers.length > 0;
+      var maxLen = habits.reduce(function (mx, h) { return Math.max(mx, longestStreak(h).length); }, 0);
+      var pct = Math.min(100, Math.round(maxLen / ms.days * 100));
+      var names = achivers.slice(0, 2).map(function (id) {
+        var h = habits.find(function (x) { return x.id === id; });
+        return h ? h.icon + h.name : '';
+      }).join('、');
+      var unlockDate = habits.unlocks[ms.days] ? habits.unlocks[ms.days].date : null;
+      html += '<div class="trophy ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+        '<div class="t-icon">' + ms.icon + '</div>' +
+        '<div class="t-info">' +
+          '<div class="t-days">' + ms.days + ' 天 · ' + ms.name + '</div>' +
+          '<div class="t-desc">同一习惯连续打卡 ' + ms.days + ' 天</div>' +
+          '<div class="t-progress"><div class="fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="t-status">' + (unlocked
+            ? '✅ 已解锁' + (unlockDate ? '（' + unlockDate + '）' : '') + (names ? ' · ' + names : '')
+            : '🔒 未解锁 · 当前最长 ' + maxLen + '/' + ms.days + ' 天') + '</div>' +
+        '</div>' +
+        '<div class="t-badge">' + (unlocked ? '🏆' : '🔒') + '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+
+    // 各习惯最佳记录
+    html += '<div class="card"><h3>📊 各习惯最佳记录</h3><div class="hint">每个习惯的历史最长连续打卡</div>';
+    if (habits.length === 0) {
+      html += '<div class="chart-empty">还没有习惯，去主页添加吧</div>';
+    } else {
+      html += '<div class="best-list">' + habits.slice().sort(function (a, b) { return longestStreak(b).length - longestStreak(a).length; })
+        .map(function (h) {
+          var ls = longestStreak(h);
+          var cs = currentStreak(h);
+          return '<div class="best-item"><span class="b-icon">' + h.icon + '</span>' +
+            '<span class="b-name">' + escapeHtml(h.name) + '</span>' +
+            '<span class="b-streak">最长 ' + ls.length + ' 天</span>' +
+            '<span style="color:var(--muted);font-size:12px">' + (cs > 0 ? '🔥当前 ' + cs + ' 天' : '') + '</span></div>';
+        }).join('') + '</div>';
+    }
+    html += '</div>';
+
+    achEl.innerHTML = html;
+    if (newUnlocks.length > 0) showTrophyModal(newUnlocks);
+  }
+
+  /* ---------- 奖杯解锁弹窗 ---------- */
+  var modalEl = document.getElementById('trophyModal');
+  function showTrophyModal(unlocks) {
+    var ms = unlocks[unlocks.length - 1];
+    document.getElementById('mIcon').textContent = ms.icon;
+    document.getElementById('mTitle').textContent = '解锁成就：' + ms.name + '！';
+    var names = unlocks.map(function (u) {
+      return u.days + ' 天奖杯';
+    }).join(' + ');
+    document.getElementById('mSub').textContent = '连续打卡 ' + names + ' 已达成，继续坚持吧！';
+    modalEl.classList.add('show');
+    celebrate();
+  }
+  document.getElementById('mClose').addEventListener('click', function () {
+    modalEl.classList.remove('show');
+  });
 
   /* ---------- 页面切换 ---------- */
   var tabs = document.querySelectorAll('.tab');
   var pageHome = document.getElementById('pageHome');
   var pageStats = document.getElementById('pageStats');
+  var pageAch = document.getElementById('pageAch');
   var addFormEl = document.getElementById('addForm');
 
   function showPage(name) {
@@ -525,8 +1136,10 @@
     tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-page') === name); });
     pageHome.classList.toggle('active', name === 'home');
     pageStats.classList.toggle('active', name === 'stats');
+    pageAch.classList.toggle('active', name === 'achieve');
     addFormEl.classList.toggle('hidden', name !== 'home');
     if (name === 'stats') renderStats();
+    if (name === 'achieve') renderAchievements();
   }
   tabs.forEach(function (t) {
     t.addEventListener('click', function () { showPage(t.getAttribute('data-page')); });
@@ -537,18 +1150,9 @@
     var card = e.target.closest('.habit');
     if (!card) return;
     var id = card.getAttribute('data-id');
-
-    if (e.target.closest('.check')) {
-      toggle(id);
-      return;
-    }
-    if (e.target.closest('.del')) {
-      removeHabit(id);
-      return;
-    }
-    if (e.target.closest('.edit')) {
-      renameHabit(id);
-    }
+    if (e.target.closest('.check')) { toggle(id); return; }
+    if (e.target.closest('.del')) { removeHabit(id); return; }
+    if (e.target.closest('.edit')) { renameHabit(id); }
   });
 
   function toggle(id) {
@@ -561,9 +1165,13 @@
     else { h.history[t] = true; }
     save();
     render();
-    if (!wasDone && before < habits.length && doneCount() === habits.length) {
-      celebrate();
-    }
+    if (!wasDone && before < habits.length && doneCount() === habits.length) celebrate();
+    checkAchievementsAfterToggle();
+  }
+
+  function checkAchievementsAfterToggle() {
+    // 若当前在成就页，刷新成就（可能触发新奖杯弹窗）
+    if (currentPage === 'achieve') renderAchievements();
   }
 
   function removeHabit(id) {
@@ -573,6 +1181,7 @@
     habits = habits.filter(function (x) { return x.id !== id; });
     save(); render();
     if (currentPage === 'stats') renderStats();
+    if (currentPage === 'achieve') renderAchievements();
   }
 
   function renameHabit(id) {
@@ -585,41 +1194,88 @@
     h.name = name;
     save(); render();
     if (currentPage === 'stats') renderStats();
+    if (currentPage === 'achieve') renderAchievements();
   }
 
-  /* ---------- 添加 ---------- */
+  /* ---------- 添加：表情网格 + 自动命名 + 预览 ---------- */
   var formEl = document.getElementById('addForm');
   var nameInput = document.getElementById('newName');
-  var emojiEl = document.getElementById('emojiPicker');
+  var emojiToggle = document.getElementById('emojiToggle');
+  var emojiGridEl = document.getElementById('emojiGrid');
+  var addPreviewEl = document.getElementById('addPreview');
 
-  EMOJIS.forEach(function (em) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = em;
-    b.addEventListener('click', function () {
-      selectedEmoji = (selectedEmoji === em) ? '' : em;
-      emojiEl.querySelectorAll('button').forEach(function (x) {
-        x.classList.toggle('selected', x === b && selectedEmoji === em);
-      });
+  // 去重后的表情列表
+  var uniqueEmojis = [];
+  var seen = {};
+  EMOJIS.forEach(function (em) { if (!seen[em]) { seen[em] = 1; uniqueEmojis.push(em); } });
+
+  (function buildEmojiGrid() {
+    var grid = document.createElement('div');
+    grid.className = 'eg-grid';
+    uniqueEmojis.forEach(function (em) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = em;
+      b.dataset.em = em;
+      b.addEventListener('click', function () { selectEmoji(em); });
+      grid.appendChild(b);
     });
-    emojiEl.appendChild(b);
+    emojiGridEl.appendChild(grid);
+  })();
+
+  function selectEmoji(em) {
+    selectedEmoji = (selectedEmoji === em) ? '' : em;
+    emojiToggle.textContent = selectedEmoji || '😀';
+    emojiGridEl.querySelectorAll('button').forEach(function (b) {
+      b.classList.toggle('selected', b.dataset.em === selectedEmoji);
+    });
+    // 根据表情自动定义习惯名（仅当名字为空时）
+    if (selectedEmoji) {
+      var def = emojiDefaultName(selectedEmoji);
+      if (def && !nameInput.value.trim()) nameInput.value = def;
+    } else {
+      if (!nameInput.value.trim()) { /* 不强制清空 */ }
+    }
+    renderAddPreview();
+  }
+
+  emojiToggle.addEventListener('click', function () {
+    emojiGridEl.classList.toggle('open');
   });
+
+  nameInput.addEventListener('input', renderAddPreview);
+
+  function renderAddPreview() {
+    var name = nameInput.value.trim();
+    var icon = selectedEmoji || '📌';
+    if (!name && !selectedEmoji) {
+      addPreviewEl.innerHTML = '';
+      return;
+    }
+    addPreviewEl.innerHTML = '<div class="pv-label">预览</div>' +
+      '<div class="pv-habit"><span class="pv-icon">' + icon + '</span>' +
+      '<span class="pv-name">' + escapeHtml(name || emojiDefaultName(selectedEmoji) || '新习惯') + '</span></div>';
+  }
 
   formEl.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name = nameInput.value.trim().slice(0, 12);
+    var name = nameInput.value.trim() || emojiDefaultName(selectedEmoji) || '';
     if (!name) { nameInput.focus(); return; }
+    name = name.slice(0, 12);
     habits.push({
       id: uid(),
       name: name,
-      icon: selectedEmoji || pickIcon(name),
+      icon: selectedEmoji || '📌',
       history: {},
       createdAt: Date.now()
     });
     save(); render();
     nameInput.value = '';
     selectedEmoji = '';
-    emojiEl.querySelectorAll('button').forEach(function (x) { x.classList.remove('selected'); });
+    emojiToggle.textContent = '😀';
+    emojiGridEl.querySelectorAll('button').forEach(function (b) { b.classList.remove('selected'); });
+    emojiGridEl.classList.remove('open');
+    addPreviewEl.innerHTML = '';
     nameInput.focus();
   });
 
@@ -627,26 +1283,20 @@
   var canvas = document.getElementById('confetti');
   var ctx = canvas.getContext('2d');
   var particles = [], rafId = null;
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   window.addEventListener('resize', resize);
   resize();
 
   function celebrate() {
     var colors = ['#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6', '#EC4899', '#FBBF24'];
     particles = [];
-    for (var i = 0; i < 120; i++) {
+    for (var i = 0; i < 130; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: -20 - Math.random() * canvas.height * 0.4,
-        w: 6 + Math.random() * 6,
-        h: 8 + Math.random() * 8,
-        vy: 2.5 + Math.random() * 3.5,
-        vx: (Math.random() - 0.5) * 2.4,
-        rot: Math.random() * Math.PI,
-        vr: (Math.random() - 0.5) * 0.25,
+        w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+        vy: 2.5 + Math.random() * 3.5, vx: (Math.random() - 0.5) * 2.4,
+        rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.25,
         color: colors[Math.floor(Math.random() * colors.length)]
       });
     }
@@ -676,6 +1326,7 @@
   var now = new Date();
   var weekCN = ['日', '一', '二', '三', '四', '五', '六'];
   dateEl.textContent = now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日 · 周' + weekCN[now.getDay()];
+  renderQuote();
   render();
 })();
 </script>
