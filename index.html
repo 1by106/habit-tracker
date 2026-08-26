@@ -11,6 +11,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="习惯打卡" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<script>
+(function(){try{var d=JSON.parse(localStorage.getItem('habit-tracker-v1'));var t=(d&&d.theme)||{mode:'system',accent:'green'};var dark=(typeof matchMedia!=='undefined'&&matchMedia('(prefers-color-scheme: dark)').matches);var m=t.mode==='dark'?'dark':(t.mode==='light'?'light':(dark?'dark':'light'));document.documentElement.setAttribute('data-theme',m);document.documentElement.setAttribute('data-accent',t.accent||'green');}catch(e){}}());
+</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" />
 <style>
   :root{
@@ -26,6 +29,111 @@
     --radius:18px;
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 18px rgba(16,24,40,.06);
   }
+  /* ---------- 主题系统 ---------- */
+  :root{
+    --border:#EDEFF2;
+    --border-strong:#E5E7EB;
+    --border-light:#F0F1F3;
+    --fill-weak:#F3F4F6;
+    --fill-mid:#E8EAED;
+    --fill-soft:#F9FAFB;
+    --ring-bg:#E5E7EB;
+    --check-border:#D1D5DB;
+    --switch-off:#D1D5DB;
+    --donut-hole:#FFFFFF;
+    --muted-strong:#6B7280;
+    --add-fade:rgba(244,246,248,0);
+  }
+  [data-theme="dark"]{
+    --bg:#111827;
+    --card:#1F2937;
+    --text:#F3F4F6;
+    --muted:#9CA3AF;
+    --muted-strong:#D1D5DB;
+    --accent:#34D399;
+    --accent-dark:#10B981;
+    --done-bg:#1A2536;
+    --border:#374151;
+    --border-strong:#4B5563;
+    --border-light:#374151;
+    --fill-weak:#374151;
+    --fill-mid:#374151;
+    --fill-soft:#2A3548;
+    --ring-bg:#374151;
+    --check-border:#4B5563;
+    --switch-off:#4B5563;
+    --donut-hole:#1F2937;
+    --add-fade:rgba(17,24,39,0);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.4);
+  }
+  [data-accent="blue"]{--accent:#3B82F6;--accent-dark:#2563EB;--accent-soft:#DBEAFE}
+  [data-accent="purple"]{--accent:#8B5CF6;--accent-dark:#7C3AED;--accent-soft:#EDE9FE}
+  [data-accent="orange"]{--accent:#F59E0B;--accent-dark:#D97706;--accent-soft:#FEF3C7}
+  [data-accent="pink"]{--accent:#EC4899;--accent-dark:#DB2777;--accent-soft:#FCE7F3}
+  [data-accent="cyan"]{--accent:#06B6D4;--accent-dark:#0891B2;--accent-soft:#CFFAFE}
+  [data-theme="dark"][data-accent="blue"]{--accent-soft:#1E3A5F}
+  [data-theme="dark"][data-accent="purple"]{--accent-soft:#3B2F63}
+  [data-theme="dark"][data-accent="orange"]{--accent-soft:#4A3208}
+  [data-theme="dark"][data-accent="pink"]{--accent-soft:#4A1D36}
+  [data-theme="dark"][data-accent="cyan"]{--accent-soft:#0B3A44}
+  [data-theme="dark"][data-accent="green"]{--accent-soft:#064E3B}
+
+  [data-theme="dark"] .ring-bg{stroke:var(--ring-bg)}
+  [data-theme="dark"] .tabs{background:var(--fill-mid)}
+  [data-theme="dark"] .tab{color:var(--muted-strong)}
+  [data-theme="dark"] .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  [data-theme="dark"] .habit{border-color:var(--border)}
+  [data-theme="dark"] .habit.done{border-color:var(--border)}
+  [data-theme="dark"] .check{border-color:var(--check-border);background:var(--card)}
+  [data-theme="dark"] .dot{background:var(--ring-bg)}
+  [data-theme="dark"] .icon-btn:hover{background:var(--fill-weak);color:var(--text)}
+  [data-theme="dark"] .kpi{background:var(--card);border-color:var(--border)}
+  [data-theme="dark"] .card{background:var(--card);border-color:var(--border)}
+  [data-theme="dark"] .chart-box{background:var(--card);border-color:var(--border)}
+  [data-theme="dark"] .stats-table th{background:var(--fill-weak);color:var(--muted-strong)}
+  [data-theme="dark"] .stats-table td{border-color:var(--border-light)}
+  [data-theme="dark"] .stats-table tr.total-row td{background:var(--fill-weak)}
+  [data-theme="dark"] .donut .donut-hole{fill:var(--donut-hole)}
+  [data-theme="dark"] .mbar .m-track{background:var(--fill-weak)}
+  [data-theme="dark"] .trophy{border-color:var(--border)}
+  [data-theme="dark"] .trophy.locked{background:var(--fill-weak)}
+  [data-theme="dark"] .trophy .t-progress{background:var(--fill-weak)}
+  [data-theme="dark"] .add{background:linear-gradient(to top, var(--bg) 72%, var(--add-fade))}
+  [data-theme="dark"] .add-card{background:var(--card);border-color:var(--border-strong)}
+  [data-theme="dark"] .add-row .emoji-btn{background:var(--fill-soft);border-color:var(--border-strong)}
+  [data-theme="dark"] .add-row input{color:var(--text)}
+  [data-theme="dark"] .emoji-grid{border-top-color:var(--border-light)}
+  [data-theme="dark"] .emoji-grid .eg-grid button:hover{background:var(--fill-weak)}
+  [data-theme="dark"] .add-preview{border-top-color:var(--border-strong)}
+  [data-theme="dark"] .pv-habit{background:var(--fill-soft);border-color:var(--border)}
+  [data-theme="dark"] .pv-icon{background:var(--card);border-color:var(--border-strong)}
+  [data-theme="dark"] .modal{background:var(--card)}
+  [data-theme="dark"] .m-btn.ghost{background:var(--fill-weak);color:var(--muted-strong)}
+  [data-theme="dark"] .edit-row input{background:var(--card);border-color:var(--border-strong);color:var(--text)}
+  [data-theme="dark"] .remind-row{border-color:var(--border-light)}
+  [data-theme="dark"] .remind-row input[type=time]{background:var(--card);border-color:var(--border-strong);color:var(--text)}
+  [data-theme="dark"] .slider{background:var(--switch-off)}
+  [data-theme="dark"] .bell{background:var(--card);border-color:var(--border-strong)}
+  [data-theme="dark"] .install-tip{background:#022C22;border-color:#064E3B;color:#6EE7B7}
+
+  .stats-table tr.total-row td{background:var(--fill-weak);font-weight:700}
+  .donut .donut-hole{fill:var(--donut-hole)}
+
+  .theme-btn{flex:none;width:46px;height:46px;border-radius:50%;border:1px solid #E5E7EB;background:#fff;font-size:19px;cursor:pointer;transition:transform .15s ease, background .2s ease}
+  .theme-btn:hover{background:#F3F4F6}
+  .theme-btn:active{transform:scale(.92)}
+  [data-theme="dark"] .theme-btn{background:var(--card);border-color:var(--border-strong)}
+  [data-theme="dark"] .theme-btn:hover{background:var(--fill-weak)}
+  .theme-group{margin-top:14px}
+  .theme-label{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .mode-row{display:flex;gap:8px}
+  .mode-btn{flex:1;border:1px solid var(--border-strong);background:var(--fill-soft);color:var(--text);border-radius:10px;padding:9px 0;font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s ease}
+  .mode-btn.active{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+  .accent-row{display:flex;gap:12px;flex-wrap:wrap}
+  .swatch{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s ease, border-color .2s ease;flex:none}
+  .swatch:hover{transform:scale(1.12)}
+  .swatch.active{border-color:var(--text)}
+
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{
@@ -335,6 +443,7 @@
         <div class="date" id="dateLabel"></div>
       </div>
       <div class="progress-wrap">
+        <button class="theme-btn" id="themeBtn" aria-label="主题换肤">🎨</button>
         <button class="bell" id="bellBtn" aria-label="每日提醒">🔔<span class="bell-dot" id="bellDot"></span></button>
         <div class="progress-num" id="progressNum">0/0</div>
         <svg class="ring" viewBox="0 0 60 60">
@@ -406,6 +515,34 @@
       <div class="edit-actions">
         <button class="m-btn ghost" id="editCancel" type="button">取消</button>
         <button class="m-btn" id="editSave" type="button">💾 保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="themeModal">
+    <div class="modal edit-modal">
+      <div class="m-title">🎨 主题换肤</div>
+      <div class="theme-group">
+        <div class="theme-label">外观模式</div>
+        <div class="mode-row">
+          <button class="mode-btn" data-mode="light" type="button">☀️ 浅色</button>
+          <button class="mode-btn" data-mode="dark" type="button">🌙 深色</button>
+          <button class="mode-btn" data-mode="system" type="button">🖥️ 跟随系统</button>
+        </div>
+      </div>
+      <div class="theme-group">
+        <div class="theme-label">主题色</div>
+        <div class="accent-row">
+          <button class="swatch" data-accent="green" style="background:#10B981" type="button" aria-label="绿色"></button>
+          <button class="swatch" data-accent="blue" style="background:#3B82F6" type="button" aria-label="蓝色"></button>
+          <button class="swatch" data-accent="purple" style="background:#8B5CF6" type="button" aria-label="紫色"></button>
+          <button class="swatch" data-accent="orange" style="background:#F59E0B" type="button" aria-label="橙色"></button>
+          <button class="swatch" data-accent="pink" style="background:#EC4899" type="button" aria-label="粉色"></button>
+          <button class="swatch" data-accent="cyan" style="background:#06B6D4" type="button" aria-label="青色"></button>
+        </div>
+      </div>
+      <div class="edit-actions">
+        <button class="m-btn ghost" id="themeCancel" type="button">关闭</button>
       </div>
     </div>
   </div>
@@ -889,6 +1026,7 @@
           var h = data.habits.map(function (x) { x.history = x.history || {}; return x; });
           h.unlocks = data.unlocks || {};
           h.reminder = data.reminder || { enabled: false, time: '20:00' };
+          h.theme = data.theme || { mode: 'system', accent: 'green' };
           return h;
         }
       }
@@ -896,10 +1034,11 @@
     var d = defaults();
     d.unlocks = {};
     d.reminder = { enabled: false, time: '20:00' };
+    d.theme = { mode: 'system', accent: 'green' };
     return d;
   }
   function save() {
-    var data = { version: 1, habits: habits, unlocks: habits.unlocks, reminder: habits.reminder };
+    var data = { version: 1, habits: habits, unlocks: habits.unlocks, reminder: habits.reminder, theme: habits.theme };
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
   }
 
@@ -1047,7 +1186,7 @@
         rows.map(function (r) {
           return '<tr><td>' + r.habit.icon + ' ' + escapeHtml(r.habit.name) + '</td><td><strong>' + r.w + '</strong></td><td><strong>' + r.m + '</strong></td><td><strong>' + r.y + '</strong></td></tr>';
         }).join('') +
-        '<tr style="background:#F9FAFB;font-weight:700"><td>合计</td><td>' + totals.w + '</td><td>' + totals.m + '</td><td>' + totals.y + '</td></tr>' +
+        '<tr class="total-row"><td>合计</td><td>' + totals.w + '</td><td>' + totals.m + '</td><td>' + totals.y + '</td></tr>' +
       '</tbody></table>';
     }
     html += '</div>';
@@ -1132,7 +1271,7 @@
     }).join('');
     return '<div class="donut-wrap">' +
       '<svg class="donut" viewBox="0 0 180 180">' + slices +
-        '<circle cx="90" cy="90" r="48" fill="#fff"/>' +
+        '<circle class="donut-hole" cx="90" cy="90" r="48"/>' +
         '<text x="90" y="87" text-anchor="middle" class="donut-total">' + total + '</text>' +
         '<text x="90" y="105" text-anchor="middle" class="donut-label">' + label + '完成</text>' +
       '</svg><div class="legend">' + legend + '</div></div>';
@@ -1488,6 +1627,57 @@
       if (alive) { rafId = requestAnimationFrame(frame); }
       else { ctx.clearRect(0, 0, canvas.width, canvas.height); rafId = null; }
     })();
+  }
+
+  /* ---------- 主题换肤 ---------- */
+  var theme = habits.theme || { mode: 'system', accent: 'green' };
+  habits.theme = theme;
+  var themeModalEl = document.getElementById('themeModal');
+
+  function resolveMode() {
+    if (theme.mode === 'dark') return 'dark';
+    if (theme.mode === 'light') return 'light';
+    if (typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  }
+
+  function applyTheme() {
+    var mode = resolveMode();
+    document.documentElement.setAttribute('data-theme', mode);
+    document.documentElement.setAttribute('data-accent', theme.accent || 'green');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', mode === 'dark' ? '#111827' : '#10B981');
+    document.querySelectorAll('.mode-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-mode') === theme.mode);
+    });
+    document.querySelectorAll('.swatch').forEach(function (s) {
+      s.classList.toggle('active', s.getAttribute('data-accent') === theme.accent);
+    });
+  }
+
+  document.getElementById('themeBtn').addEventListener('click', function () {
+    applyTheme();
+    themeModalEl.classList.add('show');
+  });
+  document.getElementById('themeCancel').addEventListener('click', function () { themeModalEl.classList.remove('show'); });
+  document.querySelectorAll('.mode-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      theme.mode = b.getAttribute('data-mode');
+      save();
+      applyTheme();
+    });
+  });
+  document.querySelectorAll('.swatch').forEach(function (s) {
+    s.addEventListener('click', function () {
+      theme.accent = s.getAttribute('data-accent');
+      save();
+      applyTheme();
+    });
+  });
+  if (typeof matchMedia !== 'undefined') {
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (theme.mode === 'system') applyTheme();
+    });
   }
 
   /* ---------- 每日提醒 + 安装提示 + Service Worker ---------- */
