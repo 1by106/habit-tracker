@@ -391,6 +391,7 @@
         <div class="date" id="dateLabel"></div>
       </div>
       <div class="progress-wrap">
+        <button class="theme-btn" id="cloudBtn" aria-label="云同步">👤</button>
         <button class="theme-btn" id="backupBtn" aria-label="数据备份">💾</button>
         <button class="theme-btn" id="themeBtn" aria-label="主题换肤">🎨</button>
         <button class="bell" id="bellBtn" aria-label="每日提醒">🔔<span class="bell-dot" id="bellDot"></span></button>
@@ -529,6 +530,39 @@
       <div class="edit-actions">
         <button class="m-btn ghost" id="remindCancel" type="button">关闭</button>
         <button class="m-btn" id="remindSave" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="cloudModal">
+    <div class="modal edit-modal">
+      <div class="m-title">☁️ 云同步（GitHub）</div>
+      <div id="cloudNotLogged" class="cloud-box">
+        <p class="remind-note" style="text-align:center;margin-bottom:6px">登录后，打卡数据会自动同步到你的 GitHub 仓库，<b>任何设备登录同一账号都能互通</b>。</p>
+        <div class="edit-row" style="margin-bottom:10px">
+          <input id="cloudUser" type="text" placeholder="GitHub 用户名（如 1by106）" autocomplete="off" />
+        </div>
+        <div class="edit-row" style="margin-bottom:10px">
+          <input id="cloudToken" type="password" placeholder="GitHub Token（Personal Access Token）" autocomplete="off" />
+        </div>
+        <p class="remind-note" style="font-size:11px;line-height:1.6">🔒 Token 只保存在你自己的浏览器里，不会上传到别处；建议勾选 <b>repo / public_repo</b> 权限、有效期选 <b>永不过期</b>。生成地址：github.com/settings/tokens</p>
+        <div class="edit-actions">
+          <button class="m-btn" id="cloudLogin" type="button" style="width:100%">🔓 登录并开始同步</button>
+        </div>
+      </div>
+      <div id="cloudLogged" class="cloud-box" style="display:none">
+        <div style="text-align:center;padding:6px 0 10px">
+          <div style="font-size:40px">👤</div>
+          <div id="cloudUserName" style="font-weight:800;margin:4px 0 2px">-</div>
+          <div id="cloudStatus" style="font-size:12px;color:var(--muted)">已登录</div>
+        </div>
+        <div class="edit-actions" style="flex-direction:column;gap:10px">
+          <button class="m-btn" id="cloudSyncNow" type="button" style="width:100%">🔄 立即同步一次</button>
+          <button class="m-btn ghost" id="cloudLogout" type="button" style="width:100%">退出登录（保留本地数据）</button>
+        </div>
+      </div>
+      <div class="edit-actions">
+        <button class="m-btn ghost" id="cloudClose" type="button" style="width:100%">关闭</button>
       </div>
     </div>
   </div>
@@ -1009,9 +1043,10 @@
     d.theme = { mode: 'system', accent: 'daily' };
     return d;
   }
-  function save() {
+  function save(skipCloud) {
     var data = { version: 1, habits: habits, unlocks: habits.unlocks, reminder: habits.reminder, theme: habits.theme };
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
+    if (!skipCloud && typeof scheduleCloudPush === 'function') scheduleCloudPush();
   }
 
   function isDone(h) { return !!h.history[todayStr()]; }
@@ -1832,6 +1867,199 @@
     reader.readAsText(f);
     backupFileEl.value = '';
   });
+
+  /* ---------- 云同步（GitHub） ---------- */
+  var GH_OWNER = '';   // 从登录信息获取
+  var GH_REPO = 'habit-tracker';
+  var GH_PATH = 'habit-data.json';
+  var GH_TOKEN = '';
+  var GH_USER = '';
+  var cloudTimer = null;
+  var cloudSyncing = false;
+
+  var cloudModalEl = document.getElementById('cloudModal');
+  var cloudNotLoggedEl = document.getElementById('cloudNotLogged');
+  var cloudLoggedEl = document.getElementById('cloudLogged');
+  var cloudUserEl = document.getElementById('cloudUser');
+  var cloudTokenEl = document.getElementById('cloudToken');
+  var cloudUserNameEl = document.getElementById('cloudUserName');
+  var cloudStatusEl = document.getElementById('cloudStatus');
+  var cloudBtnEl = document.getElementById('cloudBtn');
+
+  function loadCloudAuth() {
+    try {
+      GH_TOKEN = localStorage.getItem('habit-gh-token') || '';
+      GH_USER = localStorage.getItem('habit-gh-user') || '';
+      GH_OWNER = GH_USER;
+    } catch (e) { /* ignore */ }
+  }
+  function saveCloudAuth() {
+    try {
+      localStorage.setItem('habit-gh-token', GH_TOKEN);
+      localStorage.setItem('habit-gh-user', GH_USER);
+    } catch (e) { /* ignore */ }
+  }
+  function clearCloudAuth() {
+    GH_TOKEN = ''; GH_USER = ''; GH_OWNER = '';
+    try { localStorage.removeItem('habit-gh-token'); localStorage.removeItem('habit-gh-user'); } catch (e) { /* ignore */ }
+  }
+
+  function updateCloudUI() {
+    var logged = !!GH_TOKEN && !!GH_USER;
+    cloudNotLoggedEl.style.display = logged ? 'none' : '';
+    cloudLoggedEl.style.display = logged ? '' : 'none';
+    cloudBtnEl.textContent = logged ? '☁️' : '👤';
+    if (logged) {
+      cloudUserNameEl.textContent = GH_USER;
+      if (!cloudStatusEl.textContent || cloudStatusEl.textContent.indexOf('已登录') === 0) {
+        cloudStatusEl.textContent = '已登录，数据自动同步';
+      }
+    }
+  }
+
+  function ghFetch(url, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }, opts.headers || {});
+    return fetch(url, opts);
+  }
+
+  // 读取云端数据
+  async function cloudPull() {
+    if (!GH_TOKEN || !GH_OWNER) return null;
+    var res = await ghFetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('读取失败 ' + res.status);
+    var j = await res.json();
+    var content = decodeURIComponent(escape(atob(j.content)));
+    return JSON.parse(content);
+  }
+
+  // 上传云端数据
+  async function cloudPush(data) {
+    if (!GH_TOKEN || !GH_OWNER) return;
+    var sha = null;
+    var res = await ghFetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH);
+    if (res.ok) { var j = await res.json(); sha = j.sha; }
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    var body = { message: 'sync habit data', content: content };
+    if (sha) body.sha = sha;
+    var put = await ghFetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!put.ok) throw new Error('上传失败 ' + put.status);
+  }
+
+  function cloudDataSnapshot() {
+    return { version: 1, updatedAt: Date.now(), habits: habits, unlocks: habits.unlocks, reminder: habits.reminder, theme: habits.theme };
+  }
+
+  // 合并云端与本地：以 updatedAt 较新的一方为准；若本地无数据则用云端
+  function mergeCloud(cloud) {
+    if (!cloud || !Array.isArray(cloud.habits)) return;
+    var localUpdated = habits._updatedAt || 0;
+    var cloudUpdated = cloud.updatedAt || 0;
+    if (cloudUpdated > localUpdated || habits.length === 0) {
+      var h = cloud.habits.map(function (x) { x.history = x.history || {}; return x; });
+      h.unlocks = cloud.unlocks || {};
+      h.reminder = cloud.reminder || { enabled: false, time: '20:00' };
+      h.theme = cloud.theme || { mode: 'system', accent: 'daily' };
+      habits = h;
+      habits._updatedAt = cloudUpdated;
+      save(true);
+      if (typeof render === 'function') render(true);
+    }
+  }
+
+  async function cloudSync(silent) {
+    if (cloudSyncing) return;
+    if (!GH_TOKEN || !GH_OWNER) return;
+    cloudSyncing = true;
+    if (!silent) setCloudStatus('正在同步…');
+    try {
+      var cloud = await cloudPull();
+      var localHasData = habits.length > 0;
+      var localUpdated = habits._updatedAt || 0;
+      if (cloud) {
+        // 云端有数据：取较新一方
+        if (cloud.updatedAt > localUpdated || !localHasData) {
+          mergeCloud(cloud);
+          if (!silent) setCloudStatus('✅ 已从云端拉取最新数据');
+        } else {
+          await cloudPush(cloudDataSnapshot());
+          if (!silent) setCloudStatus('✅ 已将本地数据同步到云端');
+        }
+      } else if (localHasData) {
+        // 云端无数据，本地上传
+        await cloudPush(cloudDataSnapshot());
+        if (!silent) setCloudStatus('✅ 首次同步完成');
+      } else {
+        if (!silent) setCloudStatus('暂无数据可同步');
+      }
+    } catch (e) {
+      if (!silent) { setCloudStatus('❌ ' + e.message); showToast('☁️ 同步失败：' + e.message); }
+    } finally {
+      cloudSyncing = false;
+    }
+  }
+
+  function setCloudStatus(t) {
+    if (cloudStatusEl) cloudStatusEl.textContent = t;
+    if (t.indexOf('❌') === 0) cloudStatusEl.style.color = '#EF4444';
+    else cloudStatusEl.style.color = '';
+  }
+
+  function scheduleCloudPush() {
+    if (!GH_TOKEN || !GH_OWNER) return;
+    habits._updatedAt = Date.now();
+    if (cloudTimer) clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(function () {
+      cloudPush(cloudDataSnapshot()).then(function () {
+        // 静默成功
+      }).catch(function (e) {
+        showToast('☁️ 同步失败：' + e.message);
+      });
+    }, 2500);
+  }
+
+  // 登录
+  document.getElementById('cloudLogin').addEventListener('click', function () {
+    var u = (cloudUserEl.value || '').trim();
+    var t = (cloudTokenEl.value || '').trim();
+    if (!u || !t) { showToast('⚠️ 请输入 GitHub 用户名和 Token'); return; }
+    GH_USER = u; GH_OWNER = u; GH_TOKEN = t;
+    saveCloudAuth();
+    updateCloudUI();
+    setCloudStatus('正在验证并同步…');
+    cloudSync(false).catch(function (e) {
+      setCloudStatus('❌ ' + e.message);
+    });
+  });
+  document.getElementById('cloudSyncNow').addEventListener('click', function () {
+    cloudSync(false).then(updateCloudUI);
+  });
+  document.getElementById('cloudLogout').addEventListener('click', function () {
+    clearCloudAuth();
+    updateCloudUI();
+    cloudModalEl.classList.remove('show');
+    showToast('已退出登录，本地数据保留');
+  });
+  cloudBtnEl.addEventListener('click', function () {
+    loadCloudAuth();
+    cloudUserEl.value = GH_USER;
+    cloudTokenEl.value = GH_TOKEN;
+    updateCloudUI();
+    cloudModalEl.classList.add('show');
+  });
+  document.getElementById('cloudClose').addEventListener('click', function () { cloudModalEl.classList.remove('show'); });
+
+  // 启动时自动登录并同步
+  loadCloudAuth();
+  updateCloudUI();
+  if (GH_TOKEN && GH_USER) {
+    cloudSync(true);
+  }
 
   /* Service Worker 注册 */
   if ('serviceWorker' in navigator) {
