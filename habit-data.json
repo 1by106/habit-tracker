@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1787911209942,
+  "updatedAt": 1787911240146,
   "habits": [
     {
       "id": "mtcs2rpkicoxmd",
@@ -15,7 +15,9 @@
       "id": "mtcs2rpkihnyan",
       "name": "健身",
       "icon": "💪",
-      "history": {},
+      "history": {
+        "2026-08-28": true
+      },
       "createdAt": 1787911050440
     },
     {
