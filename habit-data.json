@@ -1,12 +1,14 @@
 {
   "version": 1,
-  "updatedAt": 1787911095909,
+  "updatedAt": 1787911187074,
   "habits": [
     {
       "id": "mtcs2rpkicoxmd",
       "name": "背单词",
       "icon": "📖",
-      "history": {},
+      "history": {
+        "2026-08-28": true
+      },
       "createdAt": 1787911050440
     },
     {
